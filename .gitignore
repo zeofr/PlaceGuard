@@ -65,13 +65,14 @@ placeguard_dev.db
 # Keep migrations tracked; ignore only generated temp files
 alembic/versions/__pycache__/
 
-# ---------------- IDE / Editor ----------------
+# ---------------- IDE / Editor / AI tooling ----------------
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 .claude/
+.kiro/
 
 # ---------------- OS ----------------
 .DS_Store
