@@ -7,17 +7,32 @@ from typing import Generator
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.pool import StaticPool
 
 from config import settings
 
-# Create engine with connection pooling
-engine = create_engine(
-    settings.database_url,
-    pool_pre_ping=True,  # Verify connections before using
-    pool_size=5,
-    max_overflow=10,
-    echo=settings.database_echo,
-)
+# SQLite and PostgreSQL need different engine arguments.
+# pool_size / max_overflow are not supported by the SQLite dialect.
+_is_sqlite = settings.database_url.startswith("sqlite")
+
+if _is_sqlite:
+    # File-based SQLite: allow multithreaded access (FastAPI threadpool) and
+    # skip pool settings that SQLite doesn't support.
+    engine = create_engine(
+        settings.database_url,
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+        echo=settings.database_echo,
+    )
+else:
+    # PostgreSQL / other RDBMS: use connection pooling.
+    engine = create_engine(
+        settings.database_url,
+        pool_pre_ping=True,
+        pool_size=5,
+        max_overflow=10,
+        echo=settings.database_echo,
+    )
 
 # Session factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

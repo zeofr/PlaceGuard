@@ -1,4 +1,8 @@
-"""Student management routes."""
+"""Student management routes (admin use — read-only for students via /auth/me)."""
+
+from __future__ import annotations
+
+from datetime import date
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
@@ -11,17 +15,21 @@ from database.crud import (
     get_student,
     get_students,
     search_students,
-    update_student,
 )
 
 router = APIRouter(prefix="/students", tags=["students"])
 
 
-class StudentRequest(BaseModel):
-    """Student create/update request."""
-    
-    student_id: str
+# ---------------------------------------------------------------------------
+# Pydantic models
+# ---------------------------------------------------------------------------
+
+class StudentCreateRequest(BaseModel):
+    """Admin-facing request to add a student record."""
+
+    usn: str
     name: str
+    date_of_birth: date
     cgpa: float | None = None
     branch: str | None = None
     backlogs: int | None = None
@@ -31,46 +39,45 @@ class StudentRequest(BaseModel):
 
 
 class StudentResponse(BaseModel):
-    """Student information response."""
-    
+    """Public student profile (no date_of_birth exposed in list/get)."""
+
+    usn: str
     student_id: str
     name: str
-    cgpa: float | None
     branch: str | None
+    cgpa: float | None
     backlogs: int | None
     has_prior_offer: bool | None
     tenth_pct: float | None
     twelfth_pct: float | None
-    
+
     class Config:
         from_attributes = True
 
 
+# ---------------------------------------------------------------------------
+# Endpoints
+# ---------------------------------------------------------------------------
+
 @router.post("", response_model=StudentResponse, status_code=201)
 async def create_student_endpoint(
-    request: StudentRequest,
+    request: StudentCreateRequest,
     db: Session = Depends(get_db),
 ):
-    """Create a new student.
-    
-    Args:
-        request: Student data
-        db: Database session
-    
-    Returns:
-        Created student
+    """Create a new student record (admin operation).
+
+    In production this would be an admin-only route.
+    For now it is open so synthetic data can be loaded via HTTP as well.
     """
-    # Check if student already exists
-    existing = get_student(db, request.student_id)
+    existing = get_student(db, request.usn)
     if existing:
         raise HTTPException(
             status_code=400,
-            detail="Student with this ID already exists",
+            detail=f"Student with USN {request.usn} already exists.",
         )
-    
+
     student_schema = StudentSchema(**request.model_dump())
     student = create_student(db, student_schema)
-    
     return StudentResponse.model_validate(student)
 
 
@@ -82,65 +89,23 @@ async def list_students(
     limit: int = 100,
     db: Session = Depends(get_db),
 ):
-    """List students with optional filters.
-    
-    Args:
-        branch: Optional filter by branch
-        min_cgpa: Optional filter by minimum CGPA
-        skip: Number of records to skip
-        limit: Maximum records to return
-        db: Database session
-    
-    Returns:
-        List of students
-    """
+    """List students with optional filters."""
     if branch or min_cgpa is not None:
         students = search_students(db, branch=branch, min_cgpa=min_cgpa)
     else:
         students = get_students(db, skip=skip, limit=limit)
-    
+
     return [StudentResponse.model_validate(s) for s in students]
 
 
-@router.get("/{student_id}", response_model=StudentResponse)
+@router.get("/{usn}", response_model=StudentResponse)
 async def get_student_endpoint(
-    student_id: str,
+    usn: str,
     db: Session = Depends(get_db),
 ):
-    """Get student by ID.
-    
-    Args:
-        student_id: Student identifier
-        db: Database session
-    
-    Returns:
-        Student information
-    """
-    student = get_student(db, student_id)
+    """Get a student by USN."""
+    student = get_student(db, usn)
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
-    
-    return StudentResponse.model_validate(student)
 
-
-@router.patch("/{student_id}", response_model=StudentResponse)
-async def update_student_endpoint(
-    student_id: str,
-    updates: dict,
-    db: Session = Depends(get_db),
-):
-    """Update student information.
-    
-    Args:
-        student_id: Student identifier
-        updates: Fields to update
-        db: Database session
-    
-    Returns:
-        Updated student
-    """
-    student = update_student(db, student_id, updates)
-    if not student:
-        raise HTTPException(status_code=404, detail="Student not found")
-    
     return StudentResponse.model_validate(student)

@@ -6,11 +6,12 @@ ad-hoc dicts, so new criteria, sources, or evaluators are additive instead of re
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import date, datetime
 from enum import Enum
 from typing import Any
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
+import re
 
 
 class SenderRole(str, Enum):
@@ -54,14 +55,42 @@ class RawMessage(BaseModel):
 
 
 class Student(BaseModel):
-    student_id: str
+    """Student profile used throughout the pipeline.
+
+    usn is the canonical identifier and login credential.
+    student_id is kept for backward-compat — defaults to usn if not supplied.
+    """
+
+    usn: str
     name: str
+    date_of_birth: date | None = None
+
+    # Backward-compat alias — callers that pass student_id still work
+    student_id: str | None = None
+
     cgpa: float | None = None
     branch: str | None = None
     backlogs: int | None = None
     has_prior_offer: bool | None = None
     tenth_pct: float | None = None
     twelfth_pct: float | None = None
+
+    @field_validator("usn")
+    @classmethod
+    def validate_usn(cls, v: str) -> str:
+        """Validate USN format: 1MS<YY><BRANCH><NUMBER>  e.g. 1MS22CS042"""
+        pattern = r"^1MS\d{2}[A-Z]{2,4}\d{2,4}$"
+        if not re.match(pattern, v.upper()):
+            raise ValueError(
+                f"Invalid USN format '{v}'. "
+                "Expected format: 1MS<YY><BRANCH><NUMBER>  e.g. 1MS22CS042"
+            )
+        return v.upper()
+
+    def model_post_init(self, __context: Any) -> None:
+        # Ensure student_id always has a value (for components that use it)
+        if self.student_id is None:
+            object.__setattr__(self, "student_id", self.usn)
 
 
 class Criterion(BaseModel):

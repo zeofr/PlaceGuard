@@ -2,20 +2,22 @@
 
 Key principles:
 - Facts are append-only (insert only, never update/delete)
-- Students and Drives support full CRUD
+- Students and Drives support full CRUD (admin-imported, read-only to students)
 - ExtractedCriteria are managed by reconciliation engine
+- Registrations are write-once (eligibility-gated audit trail)
 """
 
 from __future__ import annotations
 
-from datetime import datetime
+import json
+from datetime import date, datetime
 from typing import List
 
-from sqlalchemy import and_, select
+from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
 from core.schemas import Student as StudentSchema
-from database.models import Drive, ExtractedCriterion, Fact, Student, utcnow
+from database.models import Drive, ExtractedCriterion, Fact, Registration, Student, utcnow
 
 
 # ============================================================================
@@ -23,10 +25,15 @@ from database.models import Drive, ExtractedCriterion, Fact, Student, utcnow
 # ============================================================================
 
 def create_student(db: Session, student: StudentSchema) -> Student:
-    """Create a new student record."""
+    """Create a new student record.
+
+    USN is the canonical identifier; student_id mirrors USN for compat.
+    """
     db_student = Student(
-        student_id=student.student_id,
+        usn=student.usn,
+        student_id=student.usn,          # keep in sync
         name=student.name,
+        date_of_birth=student.date_of_birth,
         cgpa=student.cgpa,
         branch=student.branch,
         backlogs=student.backlogs,
@@ -41,8 +48,40 @@ def create_student(db: Session, student: StudentSchema) -> Student:
 
 
 def get_student(db: Session, student_id: str) -> Student | None:
-    """Retrieve a student by ID."""
-    return db.query(Student).filter(Student.student_id == student_id).first()
+    """Retrieve a student by USN (or legacy student_id)."""
+    return (
+        db.query(Student)
+        .filter(
+            (Student.usn == student_id) | (Student.student_id == student_id)
+        )
+        .first()
+    )
+
+
+def get_student_by_usn(db: Session, usn: str) -> Student | None:
+    """Retrieve a student by USN."""
+    return db.query(Student).filter(Student.usn == usn.upper()).first()
+
+
+def authenticate_student(
+    db: Session, usn: str, date_of_birth: date
+) -> Student | None:
+    """Validate USN + date of birth login.
+
+    Returns the Student record if credentials match, None otherwise.
+    This is the only auth check — no password hashing needed because
+    the DOB comes from the college's admin-imported dataset.
+    """
+    return (
+        db.query(Student)
+        .filter(
+            and_(
+                Student.usn == usn.upper(),
+                Student.date_of_birth == date_of_birth,
+            )
+        )
+        .first()
+    )
 
 
 def get_students(
@@ -331,4 +370,91 @@ def get_criterion_by_type(
             )
         )
         .first()
+    )
+
+
+# ============================================================================
+# REGISTRATION OPERATIONS (WRITE-ONCE — eligibility-gated audit trail)
+# ============================================================================
+
+def create_registration(
+    db: Session,
+    usn: str,
+    drive_id: str,
+    eligibility_snapshot: dict | None = None,
+) -> Registration:
+    """Record that an eligible student received the registration link.
+
+    This is write-once — a student can only register once per drive
+    (enforced by the unique constraint on usn + drive_id).
+
+    Args:
+        db: Database session
+        usn: Student USN
+        drive_id: Drive identifier
+        eligibility_snapshot: Full EligibilityResult dict for audit
+    """
+    snapshot_str = json.dumps(eligibility_snapshot) if eligibility_snapshot else None
+    reg = Registration(
+        usn=usn.upper(),
+        drive_id=drive_id,
+        eligibility_snapshot=snapshot_str,
+    )
+    db.add(reg)
+    db.commit()
+    db.refresh(reg)
+    return reg
+
+
+def get_registration(db: Session, usn: str, drive_id: str) -> Registration | None:
+    """Check if a student has already registered for a drive."""
+    return (
+        db.query(Registration)
+        .filter(
+            and_(
+                Registration.usn == usn.upper(),
+                Registration.drive_id == drive_id,
+            )
+        )
+        .first()
+    )
+
+
+def get_registrations_by_student(db: Session, usn: str) -> List[Registration]:
+    """All drives a student has registered for."""
+    return (
+        db.query(Registration)
+        .filter(Registration.usn == usn.upper())
+        .order_by(Registration.registered_at.desc())
+        .all()
+    )
+
+
+def get_registrations_by_drive(db: Session, drive_id: str) -> List[Registration]:
+    """All students who registered for a specific drive."""
+    return (
+        db.query(Registration)
+        .filter(Registration.drive_id == drive_id)
+        .order_by(Registration.registered_at)
+        .all()
+    )
+
+
+# ============================================================================
+# TIMELINE QUERY — all facts for a drive in chronological order
+# ============================================================================
+
+def get_drive_timeline(db: Session, drive_id: str) -> List[Fact]:
+    """Return all facts for a drive ordered by timestamp ascending.
+
+    This powers the company time-series view shown to students — every
+    extracted criterion from every source, in the order they arrived.
+    The reconciliation engine's final verdict is stored in ExtractedCriterion;
+    the timeline shows the full history including superseded facts.
+    """
+    return (
+        db.query(Fact)
+        .filter(Fact.drive_id == drive_id)
+        .order_by(Fact.timestamp.asc())
+        .all()
     )

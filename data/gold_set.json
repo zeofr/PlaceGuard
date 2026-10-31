@@ -1,0 +1,180 @@
+[
+  {
+    "case_id": "CASE_001",
+    "description": "Eligible student for TechCorp (all criteria met, post-correction CGPA 7.0)",
+    "drive_id": "DRIVE_TECHCORP",
+    "student_id": "S002",
+    "notices_in_scope": ["N001", "N002", "N003", "N004"],
+    "expected_current_rules": {
+      "min_cgpa": {"operator": "gte", "value": 7.0, "authoritative_source": "msg_techcorp_002"},
+      "allowed_branches": {"operator": "in", "value": ["CSE", "ISE"], "authoritative_source": "msg_techcorp_001"},
+      "max_backlogs": {"operator": "eq", "value": 0, "authoritative_source": "msg_techcorp_001"},
+      "min_10th_pct": {"operator": "gte", "value": 60.0, "authoritative_source": "msg_techcorp_001"},
+      "min_12th_pct": {"operator": "gte", "value": 60.0, "authoritative_source": "msg_techcorp_001"}
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": true,
+    "notes": "CGPA correction (7.5→7.0) from same authority (placement_cell_whatsapp) must be applied. Student forward with old 7.5 CGPA must be ignored. Deadline extension does not affect eligibility."
+  },
+  {
+    "case_id": "CASE_002",
+    "description": "Ineligible: student has prior offer (TechCorp)",
+    "drive_id": "DRIVE_TECHCORP",
+    "student_id": "S004",
+    "notices_in_scope": ["N001", "N002"],
+    "expected_current_rules": {
+      "min_cgpa": {"operator": "gte", "value": 7.0, "authoritative_source": "msg_techcorp_002"},
+      "allowed_branches": {"operator": "in", "value": ["CSE", "ISE"]}
+    },
+    "expected_eligibility": "INELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "notes": "S004 has has_prior_offer=true. Even though CGPA 9.1 and branch CSE are fine, the no_prior_offer criterion fails."
+  },
+  {
+    "case_id": "CASE_003",
+    "description": "UNKNOWN: student CGPA missing (S008)",
+    "drive_id": "DRIVE_TECHCORP",
+    "student_id": "S008",
+    "notices_in_scope": ["N001", "N002"],
+    "expected_current_rules": {
+      "min_cgpa": {"operator": "gte", "value": 7.0, "authoritative_source": "msg_techcorp_002"}
+    },
+    "expected_eligibility": "UNKNOWN",
+    "expected_unknown": true,
+    "temporal_reasoning_required": false,
+    "notes": "S008 has cgpa=null. min_cgpa criterion must return UNKNOWN, not FAIL. No FAIL criteria exist, so overall is UNKNOWN."
+  },
+  {
+    "case_id": "CASE_004",
+    "description": "High-authority PDF overrides coordinator notice for DataSystems",
+    "drive_id": "DRIVE_DATASYSTEMS",
+    "student_id": "S003",
+    "notices_in_scope": ["N005", "N006"],
+    "expected_current_rules": {
+      "min_cgpa": {"operator": "gte", "value": 7.5, "authoritative_source": "msg_datasystems_002"},
+      "allowed_branches": {"operator": "in", "value": ["CSE", "ISE", "ECE"], "authoritative_source": "msg_datasystems_002"},
+      "max_backlogs": {"operator": "eq", "value": 0, "authoritative_source": "msg_datasystems_002"}
+    },
+    "expected_eligibility": "INELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": true,
+    "notes": "Coordinator said CGPA 7.0 and all branches with max 2 backlogs. Official PDF (rank 1) overrides to CGPA 7.5, CSE/ISE/ECE only, no backlogs. S003 has CGPA 6.9 → INELIGIBLE on CGPA. Also has 1 backlog which fails the PDF's 0-backlog requirement."
+  },
+  {
+    "case_id": "CASE_005",
+    "description": "Official placement cell overrides student rumor for InnovateLabs",
+    "drive_id": "DRIVE_INNOVATELABS",
+    "student_id": "S001",
+    "notices_in_scope": ["N007", "N008"],
+    "expected_current_rules": {
+      "min_cgpa": {"operator": "gte", "value": 8.5, "authoritative_source": "msg_innovate_002"},
+      "allowed_branches": {"operator": "in", "value": ["CSE", "ISE", "ECE"], "authoritative_source": "msg_innovate_002"},
+      "max_backlogs": {"operator": "eq", "value": 0, "authoritative_source": "msg_innovate_002"}
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": true,
+    "notes": "Student message said CGPA 8.0, placement cell said 8.5. Authority rank 2 overrides rank 5. S001 CGPA 8.72 passes. Branch CSE, 0 backlogs, no prior offer — all pass."
+  },
+  {
+    "case_id": "CASE_006",
+    "description": "Three-update chain: QuickByte final state is CGPA 8.0, CSE only, deadline 6 Nov",
+    "drive_id": "DRIVE_QUICKBYTE",
+    "student_id": "S001",
+    "notices_in_scope": ["N015", "N016", "N017", "N018"],
+    "expected_current_rules": {
+      "min_cgpa": {"operator": "gte", "value": 8.0, "authoritative_source": "msg_quickbyte_003"},
+      "allowed_branches": {"operator": "in", "value": ["CSE"], "authoritative_source": "msg_quickbyte_003"},
+      "max_backlogs": {"operator": "eq", "value": 0, "authoritative_source": "msg_quickbyte_001"}
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": true,
+    "provenance_reasoning_required": true,
+    "notes": "Three same-authority updates. Final state: CGPA 8.0 (N017 correction beats N015 7.5), branches CSE only (N017 beats N015 multi-branch), deadline 6 Nov (N016 beats N015). Student forward N018 restating old values must be ignored (rank 5 vs rank 2). S001 CGPA 8.72, branch CSE, 0 backlogs — ELIGIBLE."
+  },
+  {
+    "case_id": "CASE_007",
+    "description": "Ineligible branch for QuickByte after correction",
+    "drive_id": "DRIVE_QUICKBYTE",
+    "student_id": "S007",
+    "notices_in_scope": ["N015", "N016", "N017", "N018"],
+    "expected_current_rules": {
+      "allowed_branches": {"operator": "in", "value": ["CSE"], "authoritative_source": "msg_quickbyte_003"}
+    },
+    "expected_eligibility": "INELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": true,
+    "notes": "S007 is ECE branch. After N017 correction restricts to CSE only, S007 is INELIGIBLE on branch even though the original N015 allowed CSE/ISE/ECE."
+  },
+  {
+    "case_id": "CASE_008",
+    "description": "UNKNOWN: backlogs field missing for S009",
+    "drive_id": "DRIVE_TECHCORP",
+    "student_id": "S009",
+    "notices_in_scope": ["N001", "N002"],
+    "expected_eligibility": "UNKNOWN",
+    "expected_unknown": true,
+    "temporal_reasoning_required": false,
+    "notes": "S009 has backlogs=null. No FAIL criteria, so overall is UNKNOWN (not INELIGIBLE). System must not assume backlogs=0."
+  },
+  {
+    "case_id": "CASE_009",
+    "description": "INELIGIBLE on CGPA (below threshold) for NexGen",
+    "drive_id": "DRIVE_NEXGEN",
+    "student_id": "S010",
+    "notices_in_scope": ["N013"],
+    "expected_current_rules": {
+      "min_cgpa": {"operator": "gte", "value": 8.0, "authoritative_source": "msg_nexgen_001"}
+    },
+    "expected_eligibility": "INELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "notes": "S010 CGPA 7.2 < 8.0 minimum. Branch CSE matches. Backlogs 0 OK. 10th 72% >= 70% OK. 12th 68.5% < 70% also fails. Both min_cgpa and min_12th_pct should FAIL."
+  },
+  {
+    "case_id": "CASE_010",
+    "description": "UNKNOWN: 12th percentage missing for S015 on NexGen",
+    "drive_id": "DRIVE_NEXGEN",
+    "student_id": "S015",
+    "notices_in_scope": ["N013"],
+    "expected_eligibility": "UNKNOWN",
+    "expected_unknown": true,
+    "temporal_reasoning_required": false,
+    "notes": "S015 twelfth_pct=null. CGPA 8.10 passes, branch CSE passes, backlogs 0 passes, 10th 82% passes. But 12th_pct unknown → overall UNKNOWN because we cannot confirm all criteria."
+  },
+  {
+    "case_id": "CASE_011",
+    "description": "Eligible for SoftEdge (open to all, low bar)",
+    "drive_id": "DRIVE_SOFTEDGE",
+    "student_id": "S012",
+    "notices_in_scope": ["N014"],
+    "expected_current_rules": {
+      "min_cgpa": {"operator": "gte", "value": 6.0, "authoritative_source": "msg_softedge_001"}
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "notes": "SoftEdge has minimal criteria: CGPA 6.0, all branches, no backlog or offer restriction. S012 CGPA 6.5, CIVIL, 3 backlogs but no backlog restriction stated. Should be ELIGIBLE for min_cgpa criterion."
+  },
+  {
+    "case_id": "CASE_012",
+    "description": "TechCorp V2: official PDF (rank 1) overrides WhatsApp (rank 2)",
+    "drive_id": "DRIVE_TECHCORP_V2",
+    "student_id": "S003",
+    "notices_in_scope": ["N011", "N012"],
+    "expected_current_rules": {
+      "min_cgpa": {"operator": "gte", "value": 7.5, "authoritative_source": "msg_techcorpv2_002"},
+      "allowed_branches": {"operator": "in", "value": ["CSE", "ISE"], "authoritative_source": "msg_techcorpv2_002"},
+      "max_backlogs": {"operator": "eq", "value": 0, "authoritative_source": "msg_techcorpv2_002"}
+    },
+    "expected_eligibility": "INELIGIBLE",
+    "expected_unknown": false,
+    "provenance_reasoning_required": true,
+    "notes": "WhatsApp (rank 2) said CGPA 7.0, all branches, max 1 backlog. Official PDF (rank 1) overrides: CGPA 7.5, CSE/ISE only, no backlogs. S003 ECE branch → INELIGIBLE on branch. Also CGPA 6.9 < 7.5 and has 1 backlog."
+  }
+]

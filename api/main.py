@@ -7,6 +7,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from api.routes import drives, eligibility, ingestion, students
+from api.routes.auth import router as auth_router
+from api.routes.timeline import router as timeline_router
 from config import settings
 from database.connection import init_db
 
@@ -48,10 +50,12 @@ async def health_check():
 
 
 # Include routers
+app.include_router(auth_router)
 app.include_router(students.router)
 app.include_router(drives.router)
 app.include_router(eligibility.router)
 app.include_router(ingestion.router)
+app.include_router(timeline_router)
 
 
 # Root endpoint
@@ -63,10 +67,13 @@ async def root():
         "version": "1.0.0",
         "docs": "/docs",
         "endpoints": {
+            "auth": "/auth/login",
+            "me": "/auth/me",
             "students": "/students",
             "drives": "/drives",
-            "eligibility": "/eligibility",
-            "ingestion": "/ingest",
+            "eligibility": "/eligibility/check",
+            "ingestion": "/ingest/notice",
+            "timeline": "/timeline/{drive_id}",
         },
     }
 

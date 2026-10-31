@@ -9,9 +9,9 @@ Key design principles from DESIGN.md:
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 
-from sqlalchemy import Boolean, DateTime, Float, Integer, String, Text
+from sqlalchemy import Boolean, Date, DateTime, Float, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -33,12 +33,30 @@ class Base(DeclarativeBase):
 
 
 class Student(Base):
-    """Student profile with eligibility-relevant attributes."""
+    """Student profile with eligibility-relevant attributes.
+
+    Login credentials: usn + date_of_birth (matches college portal convention).
+    USN format: 1MS<YY><BRANCH><NUMBER>  e.g. 1MS22CS042
+    All eligibility fields are nullable to correctly propagate UNKNOWN state.
+    """
     
     __tablename__ = "students"
     
-    student_id: Mapped[str] = mapped_column(String(50), primary_key=True)
+    # Primary key — internal autoincrement so USN can be updated if needed
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+
+    # Login / identity fields
+    usn: Mapped[str] = mapped_column(String(20), nullable=False, unique=True, index=True)
+    date_of_birth: Mapped[date] = mapped_column(Date, nullable=False)
+
+    # Profile
     name: Mapped[str] = mapped_column(String(200), nullable=False)
+
+    # Kept for backward-compat with existing code that references student_id.
+    # Populated automatically as the USN; callers that pass student_id still work.
+    student_id: Mapped[str] = mapped_column(
+        String(20), nullable=False, unique=True, index=True
+    )
     
     # Eligibility criteria fields (nullable to support UNKNOWN state)
     cgpa: Mapped[float | None] = mapped_column(Float, nullable=True)
@@ -57,7 +75,7 @@ class Student(Base):
     )
     
     def __repr__(self) -> str:
-        return f"<Student {self.student_id} ({self.name})>"
+        return f"<Student {self.usn} ({self.name})>"
 
 
 class Drive(Base):
@@ -71,6 +89,12 @@ class Drive(Base):
         String(20), nullable=False, default="active"
     )  # active | closed | cancelled
     deadline: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+    # URL shown to eligible students — populated by admin when drive is created
+    registration_link: Mapped[str | None] = mapped_column(String(500), nullable=True)
+
+    # Optional short description / job profile
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
     
     # Metadata
     created_at: Mapped[datetime] = mapped_column(
@@ -189,3 +213,37 @@ class ExtractedCriterion(Base):
             f"<ExtractedCriterion {self.drive_id}.{self.criterion_type}={self.value} "
             f"from {self.source_type}>"
         )
+
+
+class Registration(Base):
+    """Audit record of a student receiving a registration link.
+
+    Created the moment an eligible student's request is gated-and-approved.
+    This is the proof that the system worked — ineligible students never get
+    a row here.  Write-once (no updates) to preserve the audit trail.
+
+    Fields:
+        usn          — student USN (matches Student.usn)
+        drive_id     — drive the student registered for
+        registered_at — when the link was surfaced to the student
+        eligibility_snapshot — JSON snapshot of the EligibilityResult at
+                               the time of registration, for audit purposes
+    """
+
+    __tablename__ = "registrations"
+
+    __table_args__ = (
+        UniqueConstraint("usn", "drive_id", name="uq_registration_usn_drive"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    usn: Mapped[str] = mapped_column(String(20), nullable=False, index=True)
+    drive_id: Mapped[str] = mapped_column(String(50), nullable=False, index=True)
+    registered_at: Mapped[datetime] = mapped_column(
+        DateTime, nullable=False, default=utcnow
+    )
+    # Full JSON snapshot of the eligibility result for auditing
+    eligibility_snapshot: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    def __repr__(self) -> str:
+        return f"<Registration {self.usn} → {self.drive_id} at {self.registered_at}>"

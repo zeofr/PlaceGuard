@@ -7,11 +7,19 @@ pytest>=8.3
 
 # Database
 sqlalchemy>=2.0
-psycopg2-binary>=2.9
 alembic>=1.13
+# Driver for SQLite is built into Python — no extra package needed for dev.
+# For MySQL production: uncomment below
+# pymysql>=1.1.0
+# For PostgreSQL production: uncomment below
+# psycopg2-binary>=2.9
+
+# Auth
+python-jose[cryptography]>=3.3.0
 
 # LLM - LangChain
 langchain>=0.3.0
+langchain-core>=0.3.0
 langchain-google-genai>=2.0.0
 langchain-openai>=0.2.0
 langchain-anthropic>=0.3.0

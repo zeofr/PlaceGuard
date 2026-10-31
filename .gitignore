@@ -1,8 +1,112 @@
+# =============================================================================
+# PlaceGuard — .gitignore
+# =============================================================================
+
+# ---------------- Python ----------------
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+develop-eggs/
+.installed.cfg
+lib/
+lib64/
+wheels/
+
+# Virtual environments
 .venv/
 venv/
+env/
+ENV/
+.env/
+virtualenv/
+
+# Type checking / linting caches
+.mypy_cache/
+.ruff_cache/
+.dmypy.json
+dmypy.json
+.pytype/
+
+# Testing
 .pytest_cache/
-*.egg-info/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+*.hypothesis/
+.tox/
+nosetests.xml
+test-results/
+
+# ---------------- Environment / Secrets ----------------
 .env
+.env.*
+!.env.example
+!.env.local.example
+
+# ---------------- Database ----------------
+*.db
+*.sqlite
+*.sqlite3
+placeguard_dev.db
+
+# ---------------- Alembic ----------------
+# Keep migrations tracked; ignore only generated temp files
+alembic/versions/__pycache__/
+
+# ---------------- IDE / Editor ----------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.claude/
+
+# ---------------- OS ----------------
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V7
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ---------------- Frontend — Node / Next.js ----------------
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.turbo/
+frontend/dist/
+frontend/build/
+frontend/.cache/
+frontend/.eslintcache
+frontend/*.tsbuildinfo
+frontend/next-env.d.ts
+
+# Frontend env files (keep examples)
+frontend/.env
+frontend/.env.*
+!frontend/.env.local.example
+
+# ---------------- Logs ----------------
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ---------------- Misc project artifacts ----------------
+verify_task1.py

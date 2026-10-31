@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
     
     # Database
-    database_url: str = "postgresql://placeguard:placeguard@localhost:5432/placeguard"
+    database_url: str = "sqlite:///./placeguard_dev.db"  # dev default; set postgresql:// in prod
     database_echo: bool = False  # Set to True for SQL query logging
     
     # LLM Configuration
@@ -37,7 +37,7 @@ class Settings(BaseSettings):
     # API Configuration
     jwt_secret: str = "CHANGE_THIS_IN_PRODUCTION"
     jwt_algorithm: str = "HS256"
-    jwt_expiration_hours: int = 24
+    jwt_expiration_hours: int = 1  # 1-hour session matching student portal convention
     cors_origins: list[str] = ["http://localhost:3000", "http://localhost:3001"]
     
     # Application

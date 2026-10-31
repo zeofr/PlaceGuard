@@ -1,6 +1,6 @@
 """Ingestion routes for notice processing."""
 
-from datetime import datetime
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
@@ -69,7 +69,7 @@ async def ingest_notice(
             )
         
         # Use current time if not provided
-        timestamp = request.timestamp or datetime.utcnow()
+        timestamp = request.timestamp or datetime.now(UTC).replace(tzinfo=None)
         
         # Extract criteria from notice
         llm_client = get_llm_client()

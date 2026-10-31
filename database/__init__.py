@@ -8,7 +8,7 @@ Provides PostgreSQL connection management, ORM models, and CRUD operations for:
 """
 
 from database.connection import get_db, init_db
-from database.models import Base, Drive, ExtractedCriterion, Fact, Student
+from database.models import Base, Drive, ExtractedCriterion, Fact, Registration, Student
 
 __all__ = [
     "Base",
@@ -16,6 +16,7 @@ __all__ = [
     "Drive",
     "Fact",
     "ExtractedCriterion",
+    "Registration",
     "get_db",
     "init_db",
 ]

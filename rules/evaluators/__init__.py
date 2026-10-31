@@ -10,3 +10,4 @@ from rules.evaluators import academic  # noqa: F401,E402
 from rules.evaluators import branch  # noqa: F401,E402
 from rules.evaluators import backlogs  # noqa: F401,E402
 from rules.evaluators import prior_offer  # noqa: F401,E402
+from rules.evaluators import allowed_branches  # noqa: F401,E402
