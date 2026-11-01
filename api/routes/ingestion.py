@@ -172,6 +172,19 @@ async def process_whatsapp_messages(
         
         for msg in messages:
             try:
+                # Check if this message was already processed
+                from database.crud import get_fact_by_source
+                existing_facts = get_fact_by_source(db, msg.message_id)
+                if existing_facts:
+                    # Already processed - skip
+                    processing_details.append({
+                        "message_id": msg.message_id,
+                        "body": msg.body[:100] + "..." if len(msg.body) > 100 else msg.body,
+                        "status": "skipped",
+                        "reason": f"Already processed ({len(existing_facts)} facts exist)",
+                    })
+                    continue
+                
                 # First, use LLM to identify which drive this message refers to
                 drive_id, company_name = _identify_drive_from_message(msg.body, llm_client, db)
                 

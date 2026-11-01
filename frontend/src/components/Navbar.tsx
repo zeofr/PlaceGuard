@@ -22,28 +22,44 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between">
-      <Link href="/dashboard" className="flex items-center gap-2 font-bold text-brand-700 text-lg">
-        <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-brand-600 text-white text-sm font-bold">PG</span>
-        PlaceGuard
-      </Link>
+    <nav className="bg-navy-700 border-b border-navy-800 shadow-md">
+      <div className="max-w-7xl mx-auto px-6 py-4">
+        <div className="flex items-center justify-between">
+          {/* Brand */}
+          <Link href="/dashboard" className="flex items-center gap-3 group">
+            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-brand-600 shadow-md transition-transform group-hover:scale-105">
+              <span className="text-white text-lg font-bold">PG</span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-white font-bold text-lg leading-tight">PlaceGuard</span>
+              <span className="text-navy-300 text-xs">Ramaiah Institute of Technology</span>
+            </div>
+          </Link>
 
-      <div className="flex items-center gap-6">
-        <Link href="/dashboard" className="text-sm text-gray-600 hover:text-brand-700 font-medium">
-          Drives
-        </Link>
+          {/* Right section */}
+          <div className="flex items-center gap-8">
+            <Link 
+              href="/dashboard" 
+              className="text-sm text-navy-200 hover:text-white font-medium transition-colors duration-200"
+            >
+              Placement Drives
+            </Link>
 
-        <div className="text-sm text-gray-700">
-          <span className="font-semibold">{name || "Loading..."}</span>
-          {usn && <span className="text-gray-400 ml-1 font-mono text-xs">({usn})</span>}
+            <div className="flex items-center gap-4">
+              <div className="text-sm text-right">
+                <div className="text-white font-semibold">{name || "Loading..."}</div>
+                {usn && <div className="text-navy-300 text-xs font-mono">{usn}</div>}
+              </div>
+
+              <button
+                onClick={handleLogout}
+                className="text-sm text-navy-300 hover:text-brand-400 font-medium transition-colors duration-200"
+              >
+                Sign out
+              </button>
+            </div>
+          </div>
         </div>
-
-        <button
-          onClick={handleLogout}
-          className="text-sm text-gray-500 hover:text-red-600 font-medium transition"
-        >
-          Sign out
-        </button>
       </div>
     </nav>
   );

@@ -1,19 +1,33 @@
-type Status = "ELIGIBLE" | "INELIGIBLE" | "UNKNOWN" | "active" | "closed" | "cancelled";
+import { formatDriveStatus, formatEligibilityStatus } from "@/lib/formatters";
+
+type Status = "ELIGIBLE" | "INELIGIBLE" | "UNKNOWN" | "active" | "closed" | "cancelled" | "upcoming" | "draft";
 
 const STYLES: Record<string, string> = {
-  ELIGIBLE:   "bg-green-100 text-green-800",
-  INELIGIBLE: "bg-red-100 text-red-800",
-  UNKNOWN:    "bg-yellow-100 text-yellow-800",
-  active:     "bg-green-100 text-green-700",
-  closed:     "bg-gray-100 text-gray-600",
-  cancelled:  "bg-red-100 text-red-600",
+  // Eligibility statuses
+  ELIGIBLE:   "bg-success-100 text-success-700 border-success-200",
+  INELIGIBLE: "bg-danger-100 text-danger-700 border-danger-200",
+  UNKNOWN:    "bg-warning-100 text-warning-700 border-warning-200",
+  PENDING:    "bg-blue-100 text-blue-700 border-blue-200",
+  
+  // Drive statuses
+  active:     "bg-success-100 text-success-700 border-success-200",
+  closed:     "bg-gray-100 text-gray-600 border-gray-200",
+  cancelled:  "bg-danger-100 text-danger-700 border-danger-200",
+  upcoming:   "bg-blue-100 text-blue-700 border-blue-200",
+  draft:      "bg-gray-100 text-gray-500 border-gray-200",
 };
 
 export default function StatusBadge({ status }: { status: string }) {
-  const cls = STYLES[status] ?? "bg-gray-100 text-gray-600";
+  const cls = STYLES[status] ?? "bg-gray-100 text-gray-600 border-gray-200";
+  
+  // Format the status text
+  const displayText = status.toUpperCase() === status 
+    ? formatEligibilityStatus(status) 
+    : formatDriveStatus(status);
+  
   return (
-    <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold ${cls}`}>
-      {status}
+    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${cls}`}>
+      {displayText}
     </span>
   );
 }

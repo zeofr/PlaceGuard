@@ -11,13 +11,16 @@ import { format } from "date-fns";
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [drives, setDrives]   = useState<Drive[]>([]);
+  const [drives, setDrives] = useState<Drive[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError]     = useState<string | null>(null);
-  const [filter, setFilter]   = useState<string>("active");
+  const [error, setError] = useState<string | null>(null);
+  const [filter, setFilter] = useState<string>("active");
 
   useEffect(() => {
-    if (!isLoggedIn()) { router.push("/login"); return; }
+    if (!isLoggedIn()) {
+      router.push("/login");
+      return;
+    }
     loadDrives();
   }, [filter]); // eslint-disable-line
 
@@ -28,91 +31,155 @@ export default function DashboardPage() {
       const data = await listDrives(filter === "all" ? undefined : filter);
       setDrives(data);
     } catch {
-      setError("Failed to load drives. Is the API server running?");
+      setError("Unable to load placement drives. Please check your connection and try again.");
     } finally {
       setLoading(false);
     }
   }
 
+  const filterOptions = [
+    { value: "active", label: "Active Drives", count: 0 },
+    { value: "closed", label: "Closed Drives", count: 0 },
+    { value: "all", label: "All Drives", count: 0 },
+  ];
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
 
-      <main className="max-w-5xl mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Placement Drives</h1>
-            <p className="text-sm text-gray-500 mt-0.5">
-              Click a drive to see requirements and check your eligibility.
-            </p>
-          </div>
+      <main className="max-w-7xl mx-auto px-6 py-8">
+        {/* Page header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-navy-800 mb-2">
+            Placement Drives
+          </h1>
+          <p className="text-gray-600">
+            Browse upcoming opportunities and check your eligibility for placement drives
+          </p>
+        </div>
 
-          {/* Filter tabs */}
-          <div className="flex rounded-lg overflow-hidden border border-gray-200">
-            {["active", "closed", "all"].map((f) => (
+        {/* Filter tabs */}
+        <div className="mb-6">
+          <div className="inline-flex rounded-lg overflow-hidden border border-gray-300 shadow-soft bg-white">
+            {filterOptions.map((option) => (
               <button
-                key={f}
-                onClick={() => setFilter(f)}
-                className={`px-4 py-2 text-sm font-medium transition ${
-                  filter === f
+                key={option.value}
+                onClick={() => setFilter(option.value)}
+                className={`px-6 py-3 text-sm font-semibold transition-colors duration-200 ${
+                  filter === option.value
                     ? "bg-brand-600 text-white"
-                    : "bg-white text-gray-600 hover:bg-gray-50"
+                    : "bg-white text-gray-700 hover:bg-gray-50"
                 }`}
               >
-                {f.charAt(0).toUpperCase() + f.slice(1)}
+                {option.label}
               </button>
             ))}
           </div>
         </div>
 
-        {/* States */}
+        {/* Loading state */}
         {loading && (
-          <div className="text-center py-20 text-gray-400">Loading drives…</div>
+          <div className="flex flex-col items-center justify-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-brand-600 mb-4"></div>
+            <p className="text-gray-500 text-sm">Loading placement drives...</p>
+          </div>
         )}
 
+        {/* Error state */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 text-sm">
-            {error}
+          <div className="card p-6 border-danger-200 bg-danger-50">
+            <div className="flex items-start gap-3">
+              <svg className="w-6 h-6 text-danger-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+              <div>
+                <h3 className="font-semibold text-danger-800 mb-1">Error Loading Drives</h3>
+                <p className="text-sm text-danger-700">{error}</p>
+                <button
+                  onClick={loadDrives}
+                  className="mt-3 text-sm font-medium text-danger-700 hover:text-danger-800 underline"
+                >
+                  Try again
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
+        {/* Empty state */}
         {!loading && !error && drives.length === 0 && (
-          <div className="text-center py-20 text-gray-400">
-            No {filter} drives found.
+          <div className="card p-12 text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              No {filter !== "all" ? filter : ""} placement drives found
+            </h3>
+            <p className="text-sm text-gray-600 max-w-md mx-auto">
+              {filter === "active"
+                ? "There are currently no active placement drives. Check back later for new opportunities."
+                : filter === "closed"
+                ? "No closed drives to display."
+                : "No drives have been posted yet."}
+            </p>
           </div>
         )}
 
-        {/* Drive cards */}
+        {/* Drive cards grid */}
         {!loading && !error && drives.length > 0 && (
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {drives.map((drive) => (
               <Link
                 key={drive.drive_id}
                 href={`/drive/${drive.drive_id}`}
-                className="block bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md hover:border-brand-300 transition"
+                className="card p-6 hover:shadow-medium hover:border-brand-300 transition-all duration-200 group"
               >
-                <div className="flex items-start justify-between mb-3">
-                  <h2 className="font-semibold text-gray-900 text-lg leading-tight">
+                {/* Company name and status */}
+                <div className="flex items-start justify-between mb-4">
+                  <h2 className="font-bold text-navy-800 text-lg leading-tight group-hover:text-brand-600 transition-colors">
                     {drive.company_name}
                   </h2>
                   <StatusBadge status={drive.status} />
                 </div>
 
+                {/* Deadline */}
                 {drive.deadline ? (
-                  <p className="text-sm text-gray-500">
-                    Deadline:{" "}
-                    <span className="font-medium text-gray-700">
-                      {format(new Date(drive.deadline), "dd MMM yyyy, h:mm a")}
-                    </span>
-                  </p>
+                  <div className="mb-4">
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                      Application Deadline
+                    </p>
+                    <p className="text-sm font-semibold text-gray-900">
+                      {format(new Date(drive.deadline), "dd MMM yyyy")}
+                    </p>
+                    <p className="text-xs text-gray-600">
+                      {format(new Date(drive.deadline), "h:mm a")}
+                    </p>
+                  </div>
                 ) : (
-                  <p className="text-sm text-gray-400">No deadline set</p>
+                  <div className="mb-4">
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                      Application Deadline
+                    </p>
+                    <p className="text-sm text-gray-400">Not specified</p>
+                  </div>
                 )}
 
-                <p className="text-xs text-brand-600 font-medium mt-3">
-                  View eligibility →
-                </p>
+                {/* Description preview */}
+                {drive.description && (
+                  <p className="text-sm text-gray-600 line-clamp-2 mb-4">
+                    {drive.description}
+                  </p>
+                )}
+
+                {/* CTA */}
+                <div className="flex items-center gap-2 text-brand-600 text-sm font-semibold group-hover:gap-3 transition-all">
+                  <span>View details & check eligibility</span>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
               </Link>
             ))}
           </div>
