@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test CORS</title>
+</head>
+<body>
+    <h2>Test CORS for WhatsApp Processing</h2>
+    <button onclick="testCORS()">Test API Call</button>
+    <div id="result"></div>
+
+    <script>
+        async function testCORS() {
+            const result = document.getElementById('result');
+            result.innerHTML = 'Testing...';
+            
+            try {
+                const response = await fetch('http://localhost:8000/ingest/process-whatsapp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    result.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+                    result.style.color = 'green';
+                } else {
+                    result.innerHTML = `Error: ${response.status} ${response.statusText}`;
+                    result.style.color = 'red';
+                }
+            } catch (error) {
+                result.innerHTML = `Error: ${error.message}`;
+                result.style.color = 'red';
+            }
+        }
+    </script>
+</body>
+</html>

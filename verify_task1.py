@@ -1,10 +1,10 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """Quick verification script for Task 1 completion.
 
 Run this to verify all core functionality works correctly.
 """
 
-from datetime import datetime
+from datetime import date, datetime
 
 from core.schemas import Student as StudentSchema
 from database import crud, init_db
@@ -26,8 +26,9 @@ def test_database_operations():
         # Test student creation
         print("\n2. Testing student CRUD operations...")
         student_data = StudentSchema(
-            student_id="verify_s1",
+            usn="1MS22CS999",
             name="Verification Student",
+            date_of_birth=date(2003, 4, 15),
             cgpa=8.5,
             branch="CSE",
             backlogs=0,
@@ -37,7 +38,7 @@ def test_database_operations():
         print(f"   ✓ Created student: {student.name} (CGPA: {student.cgpa})")
         
         # Test retrieval
-        retrieved = crud.get_student(db, "verify_s1")
+        retrieved = crud.get_student(db, "1MS22CS999")
         assert retrieved is not None, "Failed to retrieve student"
         print(f"   ✓ Retrieved student: {retrieved.name}")
         
@@ -83,7 +84,7 @@ def test_database_operations():
         
         # Cleanup
         print("\n6. Cleaning up test data...")
-        crud.delete_student(db, "verify_s1")
+        crud.delete_student(db, "1MS22CS999")
         print("   ✓ Test data cleaned up")
     
     print("\n" + "=" * 60)
@@ -94,7 +95,7 @@ def test_database_operations():
     print("  1. Install: pip install google-generativeai")
     print("  2. Get API key: https://makersuite.google.com/app/apikey")
     print("  3. Set in .env: GEMINI_API_KEY=your_key_here")
-    print("  4. Run: python -c \"from extraction.llm_client import GeminiClient; print('OK')\"")
+    print("  4. Run: python -c \"from extraction.llm_client import GeminiClient; print(''OK'')\"")
 
 
 def test_configuration():

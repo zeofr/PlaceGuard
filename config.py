@@ -17,7 +17,12 @@ class Settings(BaseSettings):
     database_echo: bool = False  # Set to True for SQL query logging
     
     # LLM Configuration
-    llm_provider: str = "gemini"  # gemini | openai | claude
+    llm_provider: str = "ollama"  # ollama | gemini | openai | claude
+    
+    # Ollama settings (local, free, no rate limits!)
+    ollama_base_url: str = "http://localhost:11434"
+    ollama_model: str = "llama3.1:8b"
+    ollama_temperature: float = 0.1
     
     # Gemini settings
     gemini_api_key: str | None = None
@@ -62,16 +67,17 @@ def validate_settings() -> None:
     Raises:
         ValueError: If required settings are missing or invalid
     """
-    if settings.llm_provider == "gemini" and not settings.gemini_api_key:
+    if settings.llm_provider == "ollama":
+        # Ollama doesn't require API keys
+        pass
+    elif settings.llm_provider == "gemini" and not settings.gemini_api_key:
         raise ValueError(
             "GEMINI_API_KEY must be set when using Gemini provider. "
             "Get your key from https://makersuite.google.com/app/apikey"
         )
-    
-    if settings.llm_provider == "openai" and not settings.openai_api_key:
+    elif settings.llm_provider == "openai" and not settings.openai_api_key:
         raise ValueError("OPENAI_API_KEY must be set when using OpenAI provider")
-    
-    if settings.llm_provider == "claude" and not settings.claude_api_key:
+    elif settings.llm_provider == "claude" and not settings.claude_api_key:
         raise ValueError("CLAUDE_API_KEY must be set when using Claude provider")
     
     if not settings.database_url:

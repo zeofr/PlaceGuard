@@ -1,16 +1,23 @@
-"use client";
+﻿"use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { clearSession, getName, getUSN } from "@/lib/auth";
+import { clearAuth, getName, getUSN } from "@/lib/auth";
 
 export default function Navbar() {
   const router = useRouter();
-  const name = getName();
-  const usn  = getUSN();
+  const [name, setName] = useState<string | null>(null);
+  const [usn, setUsn] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Only access localStorage on client side
+    setName(getName());
+    setUsn(getUSN());
+  }, []);
 
   function handleLogout() {
-    clearSession();
+    clearAuth();
     router.push("/login");
   }
 
@@ -27,8 +34,8 @@ export default function Navbar() {
         </Link>
 
         <div className="text-sm text-gray-700">
-          <span className="font-semibold">{name}</span>
-          <span className="text-gray-400 ml-1 font-mono text-xs">({usn})</span>
+          <span className="font-semibold">{name || "Loading..."}</span>
+          {usn && <span className="text-gray-400 ml-1 font-mono text-xs">({usn})</span>}
         </div>
 
         <button

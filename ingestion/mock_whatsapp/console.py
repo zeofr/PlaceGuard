@@ -10,13 +10,18 @@ Run with:
 
 from __future__ import annotations
 
-from fastapi import FastAPI, Form
+import httpx
+from fastapi import FastAPI, Form, BackgroundTasks
 from fastapi.responses import HTMLResponse, RedirectResponse
 
 from core.schemas import SenderRole
 from ingestion.mock_whatsapp import store
 
 app = FastAPI(title="Mock WhatsApp Console")
+
+# Configuration for automatic processing
+AUTO_PROCESS_ENABLED = True
+API_URL = "http://localhost:8000"
 
 
 def _render_page() -> str:
@@ -33,39 +38,82 @@ def _render_page() -> str:
 
     return f"""
     <html>
-    <head><title>Mock WhatsApp Console</title></head>
-    <body style="font-family: sans-serif; max-width: 900px; margin: 2rem auto;">
-      <h2>Mock WhatsApp Console</h2>
-      <p>Post a message as Placement Cell, Coordinator, or Student. Each post is timestamped
-         and tagged with the matching source type for the reconciliation engine.</p>
+    <head>
+      <title>Mock WhatsApp Console</title>
+      <style>
+        body {{ font-family: sans-serif; max-width: 900px; margin: 2rem auto; }}
+        .success {{ background: #e8f5e9; border-left: 4px solid #4caf50; padding: 12px; margin: 10px 0; }}
+        table {{ width: 100%; border-collapse: collapse; }}
+        th {{ background: #f5f5f5; text-align: left; padding: 8px; }}
+        td {{ padding: 8px; border-bottom: 1px solid #ddd; }}
+      </style>
+    </head>
+    <body>
+      <h2>📱 Mock WhatsApp Console</h2>
+      <p>Post a message as Placement Cell, Coordinator, or Student. Messages are automatically 
+         processed and added to timelines in the background.</p>
 
-      <form action="/post" method="post" style="margin-bottom: 2rem;">
-        <label>Sender role:
-          <select name="sender_role">
-            <option value="placement_cell">Placement Cell</option>
-            <option value="coordinator">Coordinator</option>
-            <option value="student">Student</option>
-          </select>
-        </label><br><br>
+      <div class="success">
+        <strong>✅ Automatic Processing Enabled</strong><br>
+        Messages are automatically processed when posted. Timeline updates happen in the background!<br>
+        View timelines at <a href="http://localhost:3000" target="_blank">http://localhost:3000</a>
+      </div>
 
-        <label>Sender id: <input type="text" name="sender_id" value="demo_sender" required></label><br><br>
+      <form action="/post" method="post" style="margin: 2rem 0;">
+        <div style="margin-bottom: 1rem;">
+          <label><strong>Sender role:</strong>
+            <select name="sender_role" style="margin-left: 10px; padding: 5px;">
+              <option value="placement_cell">Placement Cell</option>
+              <option value="coordinator">Coordinator</option>
+              <option value="student">Student</option>
+            </select>
+          </label>
+        </div>
 
-        <label>Forwarded message?
-          <input type="checkbox" name="is_forwarded" value="true">
-        </label><br><br>
+        <div style="margin-bottom: 1rem;">
+          <label><strong>Sender id:</strong>
+            <input type="text" name="sender_id" value="demo_sender" required style="margin-left: 10px; padding: 5px; width: 200px;">
+          </label>
+        </div>
 
-        <label>Message body:<br>
-          <textarea name="body" rows="4" cols="60" required></textarea>
-        </label><br><br>
+        <div style="margin-bottom: 1rem;">
+          <label>
+            <input type="checkbox" name="is_forwarded" value="true">
+            Forwarded message
+          </label>
+        </div>
 
-        <button type="submit">Post message</button>
+        <div style="margin-bottom: 1rem;">
+          <label><strong>Message body:</strong><br>
+            <textarea name="body" rows="4" cols="60" required 
+              placeholder="Example: Tech Mahindra minimum CGPA changed to 6.5"
+              style="margin-top: 5px; padding: 8px; font-family: sans-serif;"></textarea>
+          </label>
+        </div>
+
+        <button type="submit" style="background: #4caf50; color: white; padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">
+          📤 Post Message
+        </button>
       </form>
 
-      <h3>Message history (newest first)</h3>
-      <table border="1" cellpadding="6" cellspacing="0">
-        <tr><th>Timestamp</th><th>Role</th><th>Sender</th><th>Forwarded</th><th>Body</th></tr>
+      <h3>📋 Message History (newest first)</h3>
+      <table border="1" cellpadding="8" cellspacing="0">
+        <tr>
+          <th>Timestamp</th>
+          <th>Role</th>
+          <th>Sender</th>
+          <th>Forwarded</th>
+          <th>Body</th>
+        </tr>
         {rows}
       </table>
+      
+      <div style="margin-top: 20px; padding: 12px; background: #f5f5f5; border-radius: 4px;">
+        <small>
+          💡 <strong>Tip:</strong> Messages are automatically processed using LLM (takes 2-5 seconds). 
+          Criteria are extracted and timelines are updated in the background.
+        </small>
+      </div>
     </body>
     </html>
     """
@@ -76,19 +124,57 @@ def view_console() -> str:
     return _render_page()
 
 
+async def trigger_processing_in_background():
+    """Trigger message processing in the background after a message is posted."""
+    if not AUTO_PROCESS_ENABLED:
+        return
+    
+    print("🔄 Starting automatic processing...")
+    
+    try:
+        # Use async HTTP client
+        async with httpx.AsyncClient(timeout=120.0) as client:
+            response = await client.post(f"{API_URL}/ingest/process-whatsapp")
+            
+            if response.status_code == 200:
+                result = response.json()
+                print(f"✅ Auto-processing complete: {result['messages_processed']} messages, {result['total_facts_extracted']} facts extracted")
+                if result['drives_updated']:
+                    print(f"   Drives updated: {', '.join(result['drives_updated'])}")
+            else:
+                print(f"⚠️  Auto-processing failed: HTTP {response.status_code}")
+                print(f"   Response: {response.text[:200]}")
+    
+    except httpx.ConnectError:
+        print(f"⚠️  Could not connect to API at {API_URL} for auto-processing")
+        print(f"   Make sure the API server is running!")
+    except Exception as e:
+        print(f"⚠️  Auto-processing error: {type(e).__name__}: {e}")
+
+
 @app.post("/post")
-def post_message(
+async def post_message(
+    background_tasks: BackgroundTasks,
     sender_role: str = Form(...),
     sender_id: str = Form(...),
     body: str = Form(...),
     is_forwarded: str | None = Form(None),
 ) -> RedirectResponse:
-    store.add_message(
+    # Store the message
+    message = store.add_message(
         sender_id=sender_id,
         sender_role=SenderRole(sender_role),
         body=body,
         is_forwarded=is_forwarded is not None,
     )
+    
+    print(f"📱 New message posted: {body[:60]}...")
+    
+    # Trigger automatic processing in the background
+    if AUTO_PROCESS_ENABLED:
+        background_tasks.add_task(trigger_processing_in_background)
+        print(f"   🔄 Auto-processing queued for message {message.message_id[:8]}")
+    
     return RedirectResponse(url="/", status_code=303)
 
 

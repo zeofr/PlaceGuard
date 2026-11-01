@@ -107,11 +107,20 @@ class LangChainClient(LLMClient):
         response = self.model.invoke(messages, config={"temperature": temp})
         
         # Track tokens (approximate)
+        # Handle new response format where content might be a list
+        response_text = response.content
+        if isinstance(response_text, list):
+            # Extract text from list of content parts
+            response_text = "".join(
+                part.get("text", "") if isinstance(part, dict) else str(part)
+                for part in response_text
+            )
+        
         self.total_tokens_used += self.count_tokens(prompt) + self.count_tokens(
-            response.content
+            response_text
         )
         
-        return response.content
+        return response_text
     
     def generate_structured(
         self,
@@ -141,14 +150,23 @@ IMPORTANT: Respond with ONLY valid JSON. No markdown, no explanation, just the J
         messages = [HumanMessage(content=json_prompt)]
         response = self.model.invoke(messages, config={"temperature": temp})
         
+        # Handle new response format where content might be a list
+        response_text = response.content
+        if isinstance(response_text, list):
+            # Extract text from list of content parts
+            response_text = "".join(
+                part.get("text", "") if isinstance(part, dict) else str(part)
+                for part in response_text
+            )
+        
         # Track tokens
         self.total_tokens_used += self.count_tokens(json_prompt) + self.count_tokens(
-            response.content
+            response_text
         )
         
         # Parse JSON
         try:
-            parsed = parser.parse(response.content)
+            parsed = parser.parse(response_text)
             
             # Basic schema validation if provided
             if schema and "required" in schema:
@@ -161,7 +179,7 @@ IMPORTANT: Respond with ONLY valid JSON. No markdown, no explanation, just the J
         except Exception as e:
             raise ValueError(
                 f"Failed to parse JSON from LLM response. "
-                f"Raw response: {response.content[:200]}... Error: {e}"
+                f"Raw response: {response_text[:200]}... Error: {e}"
             ) from e
     
     def count_tokens(self, text: str) -> int:
@@ -184,7 +202,21 @@ def get_llm_client(provider: str | None = None) -> LLMClient:
     provider = provider or settings.llm_provider
     provider = provider.lower()
     
-    if provider == "gemini":
+    if provider == "ollama":
+        from langchain_ollama import ChatOllama
+        
+        model = ChatOllama(
+            model=settings.ollama_model,
+            base_url=settings.ollama_base_url,
+            temperature=settings.ollama_temperature,
+        )
+        
+        return LangChainClient(
+            model=model,
+            default_temperature=settings.ollama_temperature,
+        )
+    
+    elif provider == "gemini":
         if not settings.gemini_api_key:
             raise ValueError(
                 "Gemini API key not provided. Set GEMINI_API_KEY environment variable. "
@@ -246,7 +278,7 @@ def get_llm_client(provider: str | None = None) -> LLMClient:
     else:
         raise ValueError(
             f"Unknown LLM provider: {provider}. "
-            f"Supported: gemini, openai, claude"
+            f"Supported: ollama, gemini, openai, claude"
         )
 
 
