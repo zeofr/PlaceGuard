@@ -111,3 +111,7 @@ pnpm-debug.log*
 
 # ---------------- Misc project artifacts ----------------
 verify_task1.py
+
+# ---------------- Documentation (not tracked) ----------------
+DESIGN.md
+IMPLEMENTATION.md

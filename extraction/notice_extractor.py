@@ -189,8 +189,21 @@ def extract_criteria_from_notice(
         if not all(k in item for k in ["criterion_type", "operator", "value"]):
             continue  # Skip invalid items
         
-        # Serialize value to JSON string
-        value_str = json.dumps(item["value"])
+        # Normalize and serialize value to JSON string
+        value = item["value"]
+        
+        # If value is already a JSON string, parse it first to avoid double-encoding
+        if isinstance(value, str):
+            try:
+                # Try to parse - if it's already JSON, this will succeed
+                parsed = json.loads(value)
+                value = parsed
+            except (json.JSONDecodeError, ValueError):
+                # Not JSON, keep as-is (it's a plain string like "CSE")
+                pass
+        
+        # Now encode to JSON string (single encoding)
+        value_str = json.dumps(value)
         
         # Create Fact ORM object
         fact = FactModel(
