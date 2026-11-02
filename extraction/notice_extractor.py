@@ -18,9 +18,85 @@ import json
 from datetime import datetime
 from typing import Any
 
+from dateutil import parser as date_parser
+
 from core.schemas import SourceType, SOURCE_AUTHORITY_RANK
 from database.models import Fact as FactModel, utcnow
 from extraction.llm_client import LLMClient, get_llm_client
+
+
+# Branch normalization mappings
+# Maps various branch name formats to standardized codes
+BRANCH_ALIASES: dict[str, str] = {
+    # Computer Science and Engineering
+    "computer science and engineering": "CSE",
+    "computer science": "CSE",
+    "cs": "CSE",
+    "cse": "CSE",
+    
+    # Information Science and Engineering
+    "information science and engineering": "ISE",
+    "information science": "ISE",
+    "is": "ISE",
+    "ise": "ISE",
+    
+    # CSE AI & ML
+    "cse ai&ml": "CSE(AI&ML)",
+    "cse aiml": "CSE(AI&ML)",
+    "cse (ai&ml)": "CSE(AI&ML)",
+    "cse (aiml)": "CSE(AI&ML)",
+    "ai&ml": "CSE(AI&ML)",
+    "aiml": "CSE(AI&ML)",
+    "ci": "CSE(AI&ML)",
+    "artificial intelligence and machine learning": "CSE(AI&ML)",
+    
+    # CSE Cyber Security
+    "cse cyber security": "Cybersecurity",
+    "cse cybersecurity": "Cybersecurity",
+    "cyber security": "Cybersecurity",
+    "cybersecurity": "Cybersecurity",
+    "cy": "Cybersecurity",
+    
+    # Electronics and Communication Engineering
+    "electronics and communication engineering": "ECE",
+    "electronics and communication": "ECE",
+    "ec": "ECE",
+    "ece": "ECE",
+    
+    # Mechanical Engineering
+    "mechanical engineering": "MECH",
+    "mechanical": "MECH",
+    "me": "MECH",
+    "mech": "MECH",
+    
+    # Electronics and Telecommunication Engineering
+    "electronics and telecommunication engineering": "ETE",
+    "electronics and telecommunication": "ETE",
+    "et": "ETE",
+    "ete": "ETE",
+    
+    # Electronics and Instrumentation Engineering
+    "electronics and instrumentation engineering": "EIE",
+    "electronics and instrumentation": "EIE",
+    "ei": "EIE",
+    "eie": "EIE",
+    
+    # Information Technology (common alternative) - map to ISE
+    "information technology": "ISE",
+    "it": "ISE",
+}
+
+# Branch group expansions for "allied branches"
+BRANCH_GROUPS: dict[str, list[str]] = {
+    "cs allied": ["CSE", "ISE", "CSE(AI&ML)", "Cybersecurity"],
+    "cs allied branches": ["CSE", "ISE", "CSE(AI&ML)", "Cybersecurity"],
+    "cse allied": ["CSE", "ISE", "CSE(AI&ML)", "Cybersecurity"],
+    "cse allied branches": ["CSE", "ISE", "CSE(AI&ML)", "Cybersecurity"],
+    "ece allied": ["ECE", "ETE", "EIE"],
+    "ece allied branches": ["ECE", "ETE", "EIE"],
+    "ec allied": ["ECE", "ETE", "EIE"],
+    "ec allied branches": ["ECE", "ETE", "EIE"],
+}
 
 
 # Extraction prompt template
@@ -29,14 +105,45 @@ EXTRACTION_SYSTEM_PROMPT = """You are an expert at extracting structured eligibi
 Your task is to extract ALL eligibility requirements from notices sent by placement cells, coordinators, 
 or students about company recruitment drives.
 
-Common criteria types to look for:
+CRITICAL: Use EXACT criterion type names as listed below. Do NOT use variations.
+
+Required criterion types (use EXACTLY as written):
 - min_cgpa: Minimum CGPA requirement (e.g., "7.5 CGPA required")
 - max_backlogs: Maximum allowed backlogs (e.g., "no active backlogs", "max 2 backlogs")
 - allowed_branches: Branch restrictions (e.g., "CSE/ISE only", "open to all branches")
-- min_tenth_pct: Minimum 10th percentage
-- min_twelfth_pct: Minimum 12th percentage
+- branch: Alternative for allowed_branches
+- min_10th_pct: Minimum 10th percentage (use "min_10th_pct", NOT "min_tenth_pct")
+- min_12th_pct: Minimum 12th percentage (use "min_12th_pct", NOT "min_twelfth_pct")
 - no_prior_offer: Prior offer restrictions (e.g., "students with offers cannot apply")
-- deadline: Registration deadline
+- deadline: Registration deadline (MUST be in ISO format: YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS)
+
+NAMING RULES - VERY IMPORTANT:
+✓ CORRECT: min_10th_pct, min_12th_pct
+✗ WRONG: min_tenth_pct, min_twelfth_pct, tenth_pct, twelfth_pct
+
+BRANCH EXTRACTION RULES - CRITICAL:
+1. Extract branches as a comma-separated list of individual branch codes
+2. Use standard codes: CSE, ISE, CSE(AI&ML), Cybersecurity, ECE, MECH, ETE, EIE, IT
+3. NEVER extract group names like "CS Allied" or "ECE Allied" - these will be expanded automatically
+4. For compound statements like "CSE, ISE and allied branches", extract: "CSE,ISE,CSE(AI&ML),Cybersecurity"
+5. Common expansions:
+   - "CS Allied" or "CSE Allied" → CSE, ISE, CSE(AI&ML), Cybersecurity
+   - "ECE Allied" or "EC Allied" → ECE, ETE, EIE
+6. Examples:
+   - "CSE and ISE only" → "CSE,ISE"
+   - "CS Allied branches" → "CSE,ISE,CSE(AI&ML),Cybersecurity"
+   - "ECE, ETE, EIE" → "ECE,ETE,EIE"
+   - "All branches" → "ALL"
+
+DEADLINE EXTRACTION RULES - CRITICAL:
+1. ALWAYS extract deadline in ISO 8601 format: YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS
+2. Convert relative dates to absolute dates (use context to infer year if needed)
+3. Examples:
+   - "Apply by Nov 5th" → "2024-11-05"
+   - "Deadline: 5th November 6 PM" → "2024-11-05T18:00:00"
+   - "Register before 15/11/2024" → "2024-11-15"
+4. If time is mentioned, include it with T separator
+5. If only date is mentioned, use YYYY-MM-DD format
 
 Supersession detection:
 - Look for phrases like "Correction:", "Update:", "Deadline extended", "Change:", "Revised:"
@@ -47,11 +154,10 @@ IMPORTANT RULES:
 1. Extract ONLY information explicitly stated in the notice
 2. Do NOT infer or assume criteria not mentioned
 3. If something is ambiguous, mark confidence as "low" and include a note
-4. For branch requirements, normalize to standard codes: CSE, ISE, ECE, EEE, MECH, CIVIL, etc.
-5. For operators: use "gte" (>=), "lte" (<=), "eq" (=), "in" (list membership), "not_in" (exclusion)
-6. Return empty list if no criteria can be extracted
-7. For numeric values, extract just the number
-8. For branch lists, extract as comma-separated string
+4. For operators: use "gte" (>=), "lte" (<=), "eq" (=), "in" (list membership), "not_in" (exclusion)
+5. Return empty list if no criteria can be extracted
+6. For numeric values, extract just the number
+7. ALWAYS use underscore format with numbers: min_10th_pct, min_12th_pct
 
 Output format: JSON array of criterion objects with this structure:
 {
@@ -64,6 +170,13 @@ Output format: JSON array of criterion objects with this structure:
   "supersedes_ref": null,
   "notes": ""
 }
+
+EXAMPLE outputs:
+- For "70% in 12th": {"criterion_type": "min_12th_pct", "operator": "gte", "value": "70", ...}
+- For "60% in 10th": {"criterion_type": "min_10th_pct", "operator": "gte", "value": "60", ...}
+- For "CSE and ISE only": {"criterion_type": "allowed_branches", "operator": "in", "value": "CSE,ISE", ...}
+- For "CS Allied branches": {"criterion_type": "allowed_branches", "operator": "in", "value": "CSE,ISE,CSE(AI&ML),Cybersecurity", ...}
+- For "Deadline: Nov 5th 6PM": {"criterion_type": "deadline", "operator": "lte", "value": "2024-11-05T18:00:00", ...}
 """
 
 
@@ -88,6 +201,125 @@ CONFIDENCE_RANK: dict[str, int] = {
     "medium": 2,
     "low": 1,
 }
+
+
+# Mapping of common incorrect criterion type names to correct ones
+# This ensures consistency even if LLM uses variations
+CRITERION_TYPE_ALIASES: dict[str, str] = {
+    'min_tenth_pct': 'min_10th_pct',
+    'min_twelfth_pct': 'min_12th_pct',
+    'tenth_pct': 'min_10th_pct',
+    'twelfth_pct': 'min_12th_pct',
+    'tenth_percentage': 'min_10th_pct',
+    'twelfth_percentage': 'min_12th_pct',
+    'branch': 'allowed_branches',
+}
+
+
+def normalize_branch_value(value: Any) -> Any:
+    """Normalize branch values by expanding group names and standardizing codes.
+    
+    Args:
+        value: Branch value (could be string, list, or already normalized)
+        
+    Returns:
+        Normalized value (expanded and standardized)
+    """
+    # If it's already a list, process each item
+    if isinstance(value, list):
+        normalized_branches = []
+        for branch in value:
+            normalized_branches.extend(_normalize_single_branch_value(branch))
+        # Remove duplicates while preserving order
+        seen = set()
+        result = []
+        for b in normalized_branches:
+            if b not in seen:
+                seen.add(b)
+                result.append(b)
+        return result
+    
+    # If it's a string, split by comma and process
+    if isinstance(value, str):
+        # Special case: "ALL" or "all branches"
+        if value.strip().upper() == "ALL" or value.strip().lower() == "all branches":
+            return "ALL"
+        
+        # Split by comma or slash
+        parts = [p.strip() for p in value.replace('/', ',').split(',')]
+        normalized_branches = []
+        for part in parts:
+            normalized_branches.extend(_normalize_single_branch_value(part))
+        
+        # Remove duplicates while preserving order
+        seen = set()
+        result = []
+        for b in normalized_branches:
+            if b not in seen:
+                seen.add(b)
+                result.append(b)
+        
+        return result
+    
+    # Return as-is if not string or list
+    return value
+
+
+def _normalize_single_branch_value(branch_str: str) -> list[str]:
+    """Normalize a single branch string to standard codes.
+    
+    Args:
+        branch_str: Branch name/code (e.g., "CS", "CS Allied", "Computer Science")
+        
+    Returns:
+        List of normalized branch codes
+    """
+    branch_lower = branch_str.strip().lower()
+    
+    # Check if it's a group name (like "CS Allied")
+    if branch_lower in BRANCH_GROUPS:
+        return BRANCH_GROUPS[branch_lower]
+    
+    # Check if it's an alias
+    if branch_lower in BRANCH_ALIASES:
+        return [BRANCH_ALIASES[branch_lower]]
+    
+    # If not found in mappings, return original (might be already correct)
+    return [branch_str.strip()]
+
+
+def normalize_deadline_value(value: Any) -> str:
+    """Normalize deadline value to ISO 8601 format.
+    
+    Args:
+        value: Deadline value (various formats)
+        
+    Returns:
+        ISO 8601 formatted string (YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS)
+    """
+    if not isinstance(value, str):
+        return str(value)
+    
+    value_str = value.strip()
+    
+    # If already in ISO format, return as-is
+    if 'T' in value_str or len(value_str) == 10 and value_str.count('-') == 2:
+        return value_str
+    
+    # Try to parse various formats
+    from dateutil import parser as date_parser
+    
+    try:
+        parsed_date = date_parser.parse(value_str, fuzzy=True)
+        
+        # If time component is midnight, return just date
+        if parsed_date.hour == 0 and parsed_date.minute == 0 and parsed_date.second == 0:
+            return parsed_date.strftime("%Y-%m-%d")
+        else:
+            return parsed_date.strftime("%Y-%m-%dT%H:%M:%S")
+    except Exception:
+        # If parsing fails, return original
+        return value_str
 
 
 def extract_criteria_from_notice(
@@ -189,6 +421,13 @@ def extract_criteria_from_notice(
         if not all(k in item for k in ["criterion_type", "operator", "value"]):
             continue  # Skip invalid items
         
+        # Normalize criterion_type to handle common variations
+        criterion_type = item["criterion_type"]
+        if criterion_type in CRITERION_TYPE_ALIASES:
+            criterion_type = CRITERION_TYPE_ALIASES[criterion_type]
+            # Log the normalization for debugging
+            print(f"INFO: Normalized {item['criterion_type']} -> {criterion_type}")
+        
         # Normalize and serialize value to JSON string
         value = item["value"]
         
@@ -202,6 +441,18 @@ def extract_criteria_from_notice(
                 # Not JSON, keep as-is (it's a plain string like "CSE")
                 pass
         
+        # Apply criterion-specific normalization
+        if criterion_type == "allowed_branches":
+            original_value = value
+            value = normalize_branch_value(value)
+            if value != original_value:
+                print(f"INFO: Normalized branches {original_value} -> {value}")
+        elif criterion_type == "deadline":
+            original_value = value
+            value = normalize_deadline_value(value)
+            if value != original_value:
+                print(f"INFO: Normalized deadline {original_value} -> {value}")
+        
         # Now encode to JSON string (single encoding)
         value_str = json.dumps(value)
         
@@ -213,7 +464,7 @@ def extract_criteria_from_notice(
             timestamp=timestamp,
             effective_timestamp=timestamp,  # Default: effective immediately
             drive_id=drive_id,
-            criterion_type=item["criterion_type"],
+            criterion_type=criterion_type,  # Use normalized type
             scope=item.get("scope", "ALL"),
             operator=item["operator"],
             value=value_str,

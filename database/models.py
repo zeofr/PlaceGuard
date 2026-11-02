@@ -247,3 +247,47 @@ class Registration(Base):
 
     def __repr__(self) -> str:
         return f"<Registration {self.usn} → {self.drive_id} at {self.registered_at}>"
+
+
+class ProcessedEmail(Base):
+    """Track processed Gmail messages to prevent duplicate processing.
+    
+    This table stores message IDs that have been processed through the
+    Gmail ingestion pipeline. Before processing a new email, we check
+    this table to avoid re-extracting criteria from the same message.
+    
+    Fields:
+        message_id      — our internal message ID (format: gmail_{id}_{sender})
+        gmail_id        — original Gmail message ID for reference
+        sender_email    — email address of sender (placement officer)
+        processed_at    — when the email was processed
+        classification  — LLM classification result (new_offer, offer_update, etc.)
+        drive_id        — drive this email was associated with (if relevant)
+        facts_extracted — number of facts extracted from this email
+        labeled         — whether Gmail label was successfully applied
+    """
+    
+    __tablename__ = "processed_emails"
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    
+    # Message identifiers
+    message_id: Mapped[str] = mapped_column(String(200), nullable=False, unique=True, index=True)
+    gmail_id: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
+    sender_email: Mapped[str] = mapped_column(String(200), nullable=False)
+    
+    # Processing metadata
+    processed_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow)
+    classification: Mapped[str] = mapped_column(String(50), nullable=False)
+    confidence: Mapped[float] = mapped_column(Float, nullable=False)
+    
+    # Results
+    drive_id: Mapped[str | None] = mapped_column(String(50), nullable=True, index=True)
+    facts_extracted: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    labeled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    
+    # Optional: store classification reason for debugging
+    classification_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    
+    def __repr__(self) -> str:
+        return f"<ProcessedEmail {self.message_id} [{self.classification}] at {self.processed_at}>"

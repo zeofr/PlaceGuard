@@ -58,6 +58,7 @@ The LLM is never asked "is this student eligible?" It is asked "what does this n
                      PLACEMENT COMMUNICATION SOURCES
         ┌───────────────┬───────────────┬───────────────────┐
         │   Gmail feed   │ WhatsApp feed │ Portal / PDFs      │
+        │   (✅ impl.)   │   (✅ impl.)  │   (✅ impl.)       │
         └───────┬────────┴───────┬───────┴─────────┬─────────┘
                 │                │                  │
                 ▼                ▼                  ▼

@@ -24,14 +24,14 @@ DRIVE_CRITERIA = {
         {"criterion_type": "min_10th_pct", "operator": "gte", "value": 50.0, "scope": "ALL"},
         {"criterion_type": "min_12th_pct", "operator": "gte", "value": 50.0, "scope": "ALL"},
         {"criterion_type": "min_cgpa", "operator": "gte", "value": 5.0, "scope": "ALL"},  # 50% = 5.0 CGPA
-        {"criterion_type": "allowed_branches", "operator": "in", "value": ["CSE", "IT", "ECE", "EEE", "CSE(AI&ML)", "AI&ML"], "scope": "ALL"},
+        {"criterion_type": "allowed_branches", "operator": "in", "value": ["CSE", "ISE", "ECE", "CSE(AI&ML)"], "scope": "ALL"},
     ],
     "DRIVE_KPMG": [
         {"criterion_type": "min_10th_pct", "operator": "gte", "value": 60.0, "scope": "ALL"},
         {"criterion_type": "min_12th_pct", "operator": "gte", "value": 60.0, "scope": "ALL"},
         {"criterion_type": "min_cgpa", "operator": "gte", "value": 6.0, "scope": "ALL"},  # 60% = 6.0 CGPA
         {"criterion_type": "max_backlogs", "operator": "lte", "value": 0, "scope": "ALL"},
-        {"criterion_type": "allowed_branches", "operator": "in", "value": ["CSE", "CSE(AI&ML)", "Cybersecurity"], "scope": "ALL"},
+        {"criterion_type": "allowed_branches", "operator": "in", "value": ["CSE", "ISE", "CSE(AI&ML)", "Cybersecurity"], "scope": "ALL"},
     ],
     "DRIVE_BOEING": [
         {"criterion_type": "min_cgpa", "operator": "gte", "value": 7.0, "scope": "ALL"},
@@ -57,19 +57,19 @@ DRIVE_CRITERIA = {
         {"criterion_type": "min_12th_pct", "operator": "gte", "value": 65.0, "scope": "ALL"},
         {"criterion_type": "min_cgpa", "operator": "gte", "value": 6.5, "scope": "ALL"},  # 65% = 6.5 CGPA
         {"criterion_type": "max_backlogs", "operator": "lte", "value": 0, "scope": "ALL"},
-        {"criterion_type": "allowed_branches", "operator": "in", "value": ["CSE", "IT", "CSE(AI&ML)", "Cybersecurity"], "scope": "ALL"},
+        {"criterion_type": "allowed_branches", "operator": "in", "value": ["CSE", "ISE", "CSE(AI&ML)", "Cybersecurity"], "scope": "ALL"},
     ],
     "DRIVE_NVIDIA": [
         {"criterion_type": "min_cgpa", "operator": "gte", "value": 7.8, "scope": "ALL"},
-        {"criterion_type": "allowed_branches", "operator": "in", "value": ["CSE", "ECE", "EEE"], "scope": "ALL"},
+        {"criterion_type": "allowed_branches", "operator": "in", "value": ["CSE", "ISE", "ECE"], "scope": "ALL"},
     ],
     "DRIVE_OPUS": [
-        {"criterion_type": "allowed_branches", "operator": "in", "value": ["CSE", "IT", "CSE(AI&ML)"], "scope": "ALL"},
+        {"criterion_type": "allowed_branches", "operator": "in", "value": ["CSE", "ISE", "CSE(AI&ML)"], "scope": "ALL"},
     ],
     "DRIVE_IBM": [
         {"criterion_type": "min_cgpa", "operator": "gte", "value": 7.0, "scope": "ALL"},
         {"criterion_type": "max_backlogs", "operator": "lte", "value": 0, "scope": "ALL"},
-        {"criterion_type": "allowed_branches", "operator": "in", "value": ["CSE", "IT", "ECE", "EEE"], "scope": "ALL"},
+        {"criterion_type": "allowed_branches", "operator": "in", "value": ["CSE", "ISE", "ECE"], "scope": "ALL"},
     ],
 }
 
@@ -130,17 +130,17 @@ def main() -> None:
     print("=" * 70)
     print()
     print("📋 Criteria Summary:")
-    print(f"  • Tech Mahindra: 50% all levels, CS/IT/EC branches")
-    print(f"  • KPMG: 60% all levels, no backlogs, CS/AI/Cyber only")
+    print(f"  • Tech Mahindra: 50% all levels, CSE/ISE/ECE/AI&ML branches")
+    print(f"  • KPMG: 60% all levels, no backlogs, CS Allied branches only")
     print(f"  • Boeing: CGPA 7.0+")
     print(f"  • Morphle: CGPA 6.0+, no backlogs")
     print(f"  • Aptos: Open to all")
     print(f"  • GE Healthcare: 80% aggregate or 8.0 CGPA")
     print(f"  • Ericsson: 60% all levels, no backlogs")
-    print(f"  • Schneider: 65% all levels, no backlogs, CS/IT/AI/Cyber")
-    print(f"  • NVIDIA: CGPA 7.8+, CS/ECE/EEE")
-    print(f"  • Opus: CS/IT/AI branches only")
-    print(f"  • IBM: CGPA 7.0+, no backlogs, CS/IT/ECE/EEE")
+    print(f"  • Schneider: 65% all levels, no backlogs, CS Allied branches")
+    print(f"  • NVIDIA: CGPA 7.8+, CSE/ISE/ECE")
+    print(f"  • Opus: CSE/ISE/AI&ML branches only")
+    print(f"  • IBM: CGPA 7.0+, no backlogs, CSE/ISE/ECE")
     print()
     print("🔐 Now you can login and check eligibility!")
     print("   Test with USN: 1MS22CS001 / DOB: 2003-01-15")

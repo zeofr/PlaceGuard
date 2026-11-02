@@ -11,7 +11,7 @@
     "twelfth_pct": 82.0
   },
   {
-    "usn": "1MS22AI002",
+    "usn": "1MS22CI002",
     "name": "Aisha Khan",
     "date_of_birth": "2003-05-12",
     "cgpa": 7.85,
@@ -33,11 +33,11 @@
     "twelfth_pct": 91.0
   },
   {
-    "usn": "1MS22IT004",
+    "usn": "1MS22IS004",
     "name": "Priya Desai",
     "date_of_birth": "2003-08-22",
     "cgpa": 7.45,
-    "branch": "IT",
+    "branch": "ISE",
     "backlogs": 0,
     "has_prior_offer": false,
     "tenth_pct": 76.0,
@@ -77,7 +77,7 @@
     "twelfth_pct": 68.5
   },
   {
-    "usn": "1MS22AI008",
+    "usn": "1MS22CI008",
     "name": "Sneha Verma",
     "date_of_birth": "2003-07-30",
     "cgpa": null,
@@ -88,11 +88,11 @@
     "twelfth_pct": 77.0
   },
   {
-    "usn": "1MS22IT009",
+    "usn": "1MS22IS009",
     "name": "Karthik Reddy",
     "date_of_birth": "2003-09-10",
     "cgpa": 8.0,
-    "branch": "IT",
+    "branch": "ISE",
     "backlogs": null,
     "has_prior_offer": false,
     "tenth_pct": 81.0,
@@ -121,11 +121,11 @@
     "twelfth_pct": 68.0
   },
   {
-    "usn": "1MS22CV012",
+    "usn": "1MS22ET012",
     "name": "Pooja Rao",
     "date_of_birth": "2003-12-08",
     "cgpa": 6.5,
-    "branch": "CIVIL",
+    "branch": "ETE",
     "backlogs": 3,
     "has_prior_offer": false,
     "tenth_pct": 60.0,
@@ -143,18 +143,18 @@
     "twelfth_pct": 93.0
   },
   {
-    "usn": "1MS22EE014",
+    "usn": "1MS22EI014",
     "name": "Lakshmi Venkat",
     "date_of_birth": "2003-07-07",
     "cgpa": 7.9,
-    "branch": "EEE",
+    "branch": "EIE",
     "backlogs": 0,
     "has_prior_offer": false,
     "tenth_pct": 78.0,
-    "twelfth_pct": null
+    "twelfth_pct": 75.0
   },
   {
-    "usn": "1MS22AI015",
+    "usn": "1MS22CI015",
     "name": "Rahul Joshi",
     "date_of_birth": "2003-03-28",
     "cgpa": 8.4,
@@ -176,11 +176,11 @@
     "twelfth_pct": 65.0
   },
   {
-    "usn": "1MS22IT017",
+    "usn": "1MS22IS017",
     "name": "Amit Tiwari",
     "date_of_birth": "2003-05-03",
     "cgpa": 7.78,
-    "branch": "IT",
+    "branch": "ISE",
     "backlogs": 0,
     "has_prior_offer": false,
     "tenth_pct": 77.5,
@@ -220,7 +220,7 @@
     "twelfth_pct": 86.5
   },
   {
-    "usn": "1MS22AI021",
+    "usn": "1MS22CI021",
     "name": "Dev Malhotra",
     "date_of_birth": "2003-04-09",
     "cgpa": 7.65,
@@ -242,11 +242,11 @@
     "twelfth_pct": 70.0
   },
   {
-    "usn": "1MS22EE023",
+    "usn": "1MS22ET023",
     "name": "Nikhil Rao",
     "date_of_birth": "2003-06-21",
     "cgpa": 7.55,
-    "branch": "EEE",
+    "branch": "ETE",
     "backlogs": 1,
     "has_prior_offer": false,
     "tenth_pct": 75.0,
@@ -264,11 +264,11 @@
     "twelfth_pct": 87.5
   },
   {
-    "usn": "1MS22IT025",
+    "usn": "1MS22IS025",
     "name": "Aditya Pandey",
     "date_of_birth": "2003-12-15",
     "cgpa": 7.42,
-    "branch": "IT",
+    "branch": "ISE",
     "backlogs": 0,
     "has_prior_offer": false,
     "tenth_pct": 74.0,
@@ -286,7 +286,7 @@
     "twelfth_pct": 81.0
   },
   {
-    "usn": "1MS22AI027",
+    "usn": "1MS22CI027",
     "name": "Kabir Saxena",
     "date_of_birth": "2003-07-22",
     "cgpa": 8.68,
@@ -319,11 +319,11 @@
     "twelfth_pct": 67.0
   },
   {
-    "usn": "1MS22IT030",
+    "usn": "1MS22EI030",
     "name": "Anjali Mishra",
     "date_of_birth": "2003-11-28",
     "cgpa": 8.58,
-    "branch": "IT",
+    "branch": "EIE",
     "backlogs": 0,
     "has_prior_offer": false,
     "tenth_pct": 86.0,

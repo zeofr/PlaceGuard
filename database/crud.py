@@ -458,3 +458,155 @@ def get_drive_timeline(db: Session, drive_id: str) -> List[Fact]:
         .order_by(Fact.timestamp.asc())
         .all()
     )
+
+
+# ============================================================================
+# PROCESSED EMAIL OPERATIONS (Gmail duplicate prevention)
+# ============================================================================
+
+def create_processed_email(
+    db: Session,
+    message_id: str,
+    gmail_id: str,
+    sender_email: str,
+    classification: str,
+    confidence: float,
+    drive_id: str | None = None,
+    facts_extracted: int = 0,
+    labeled: bool = False,
+    classification_reason: str | None = None,
+) -> "ProcessedEmail":
+    """Record that an email has been processed.
+    
+    Args:
+        db: Database session
+        message_id: Our internal message ID
+        gmail_id: Gmail message ID
+        sender_email: Email address of sender
+        classification: LLM classification result
+        confidence: Classification confidence (0.0-1.0)
+        drive_id: Associated drive ID (if relevant)
+        facts_extracted: Number of facts extracted
+        labeled: Whether Gmail label was applied
+        classification_reason: Reason for classification
+        
+    Returns:
+        Created ProcessedEmail record
+    """
+    from database.models import ProcessedEmail
+    
+    processed = ProcessedEmail(
+        message_id=message_id,
+        gmail_id=gmail_id,
+        sender_email=sender_email,
+        classification=classification,
+        confidence=confidence,
+        drive_id=drive_id,
+        facts_extracted=facts_extracted,
+        labeled=labeled,
+        classification_reason=classification_reason,
+    )
+    db.add(processed)
+    db.commit()
+    db.refresh(processed)
+    return processed
+
+
+def get_processed_email(db: Session, message_id: str) -> "ProcessedEmail | None":
+    """Check if an email has been processed.
+    
+    Args:
+        db: Database session
+        message_id: Our internal message ID
+        
+    Returns:
+        ProcessedEmail record if found, None otherwise
+    """
+    from database.models import ProcessedEmail
+    
+    return (
+        db.query(ProcessedEmail)
+        .filter(ProcessedEmail.message_id == message_id)
+        .first()
+    )
+
+
+def is_email_processed(db: Session, message_id: str) -> bool:
+    """Check if an email has already been processed.
+    
+    Args:
+        db: Database session
+        message_id: Our internal message ID
+        
+    Returns:
+        True if email was already processed, False otherwise
+    """
+    return get_processed_email(db, message_id) is not None
+
+
+def get_processed_emails_by_drive(
+    db: Session, drive_id: str
+) -> List["ProcessedEmail"]:
+    """Get all processed emails for a specific drive.
+    
+    Args:
+        db: Database session
+        drive_id: Drive identifier
+        
+    Returns:
+        List of ProcessedEmail records
+    """
+    from database.models import ProcessedEmail
+    
+    return (
+        db.query(ProcessedEmail)
+        .filter(ProcessedEmail.drive_id == drive_id)
+        .order_by(ProcessedEmail.processed_at.desc())
+        .all()
+    )
+
+
+def get_recent_processed_emails(
+    db: Session, limit: int = 100
+) -> List["ProcessedEmail"]:
+    """Get recently processed emails.
+    
+    Args:
+        db: Database session
+        limit: Maximum number of records to return
+        
+    Returns:
+        List of ProcessedEmail records ordered by processed_at desc
+    """
+    from database.models import ProcessedEmail
+    
+    return (
+        db.query(ProcessedEmail)
+        .order_by(ProcessedEmail.processed_at.desc())
+        .limit(limit)
+        .all()
+    )
+
+
+def update_processed_email_label_status(
+    db: Session, message_id: str, labeled: bool = True
+) -> bool:
+    """Update the labeled status of a processed email.
+    
+    Args:
+        db: Database session
+        message_id: Our internal message ID
+        labeled: New labeled status
+        
+    Returns:
+        True if updated, False if not found
+    """
+    from database.models import ProcessedEmail
+    
+    processed = get_processed_email(db, message_id)
+    if not processed:
+        return False
+    
+    processed.labeled = labeled
+    db.commit()
+    return True

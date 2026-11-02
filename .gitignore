@@ -55,6 +55,12 @@ test-results/
 !.env.example
 !.env.local.example
 
+# Gmail API credentials and tokens (NEVER commit these!)
+credentials.json
+token.json
+gmail_credentials.json
+gmail_token.json
+
 # ---------------- Database ----------------
 *.db
 *.sqlite

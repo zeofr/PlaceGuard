@@ -49,6 +49,14 @@ class Settings(BaseSettings):
     debug: bool = False
     log_level: str = "INFO"
     
+    # Gmail API Integration
+    gmail_credentials_path: str = "credentials.json"
+    gmail_token_path: str = "token.json"
+    placement_officer_email: str | None = None  # Email address of placement officer
+    gmail_polling_enabled: bool = True  # Enable automatic email polling
+    gmail_polling_interval_minutes: int = 60  # Polling interval in minutes (default: 1 hour)
+    gmail_processed_label: str = "PlaceGuard/Processed"  # Gmail label for processed emails
+    
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

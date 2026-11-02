@@ -8,7 +8,7 @@ for a real integration is an adapter change, not a rewrite).
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime
 
 from core.schemas import RawMessage, SenderRole, SourceType
 
@@ -32,7 +32,7 @@ def add_message(
         source_type=_SENDER_ROLE_TO_SOURCE_TYPE[sender_role],
         sender_id=sender_id,
         sender_role=sender_role,
-        timestamp=datetime.now(timezone.utc),
+        timestamp=datetime.now(),  # Local time (timezone-naive) - NOT UTC
         body=body,
         message_type="text",
         is_forwarded=is_forwarded,

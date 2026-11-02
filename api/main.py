@@ -34,8 +34,29 @@ app.add_middleware(
 # Startup event
 @app.on_event("startup")
 async def startup_event():
-    """Initialize database on startup."""
+    """Initialize database and start background services on startup."""
     init_db()
+    
+    # Start Gmail polling service if enabled
+    try:
+        from ingestion.gmail.polling_service import start_polling_service
+        await start_polling_service()
+    except Exception as e:
+        # Log error but don't prevent app startup
+        import logging
+        logging.error(f"Failed to start Gmail polling service: {e}")
+
+
+# Shutdown event
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Clean up background services on shutdown."""
+    try:
+        from ingestion.gmail.polling_service import stop_polling_service
+        await stop_polling_service()
+    except Exception as e:
+        import logging
+        logging.error(f"Failed to stop Gmail polling service: {e}")
 
 
 # Health check
