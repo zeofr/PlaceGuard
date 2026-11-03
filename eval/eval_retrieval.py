@@ -47,8 +47,12 @@ def build_scratch_store(source_index: dict) -> tuple[PlacementVectorStore, str]:
     return store, scratch_dir
 
 
-def run_retrieval_eval(ks: list[int]) -> None:
+def run_retrieval_eval(ks: list[int], case_ids: set[str] | None = None, limit: int | None = None) -> None:
     gold_cases = json.loads(GOLD_SET_FILE.read_text(encoding="utf-8"))
+    if case_ids:
+        gold_cases = [c for c in gold_cases if c["case_id"] in case_ids]
+    if limit:
+        gold_cases = gold_cases[:limit]
     source_index = _load_source_index()
 
     print(f"Indexing {len(source_index)} sources into a scratch Chroma store...")
@@ -86,5 +90,8 @@ def run_retrieval_eval(ks: list[int]) -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--k", nargs="+", type=int, default=[3, 5, 10])
+    parser.add_argument("--cases", type=str, default=None, help="Comma-separated case_ids to run.")
+    parser.add_argument("--limit", type=int, default=None, help="Only run the first N cases.")
     args = parser.parse_args()
-    run_retrieval_eval(sorted(set(args.k)))
+    case_ids = set(args.cases.split(",")) if args.cases else None
+    run_retrieval_eval(sorted(set(args.k)), case_ids=case_ids, limit=args.limit)

@@ -372,9 +372,17 @@ def _check_claims_supported(claims: list[dict[str, Any]], result) -> tuple[int, 
 # Core evaluation loop
 # ---------------------------------------------------------------------------
 
-def run_evaluation(with_explanation: bool = False) -> EvalReport:
+def run_evaluation(
+    with_explanation: bool = False,
+    case_ids: set[str] | None = None,
+    limit: int | None = None,
+) -> EvalReport:
     students = _load_students()
     gold_cases: list[dict] = json.loads(GOLD_SET_FILE.read_text(encoding="utf-8"))
+    if case_ids:
+        gold_cases = [c for c in gold_cases if c["case_id"] in case_ids]
+    if limit:
+        gold_cases = gold_cases[:limit]
     source_index = _load_source_index()
 
     all_source_ids: set[str] = set()
@@ -670,9 +678,19 @@ if __name__ == "__main__":
         "--with-explanation", action="store_true",
         help="Also generate LLM explanations and measure hallucination rate (slower).",
     )
+    parser.add_argument(
+        "--cases", type=str, default=None,
+        help="Comma-separated case_ids to run instead of the full gold set (e.g. CASE_001,CASE_024).",
+    )
+    parser.add_argument(
+        "--limit", type=int, default=None,
+        help="Only run the first N cases of the gold set (applied after --cases, if both given).",
+    )
     args = parser.parse_args()
 
+    case_ids = set(args.cases.split(",")) if args.cases else None
+
     print("Running evaluation against the real pipeline (no DB/Chroma writes)...\n")
-    report = run_evaluation(with_explanation=args.with_explanation)
+    report = run_evaluation(with_explanation=args.with_explanation, case_ids=case_ids, limit=args.limit)
     print_report(report)
     save_results(report)

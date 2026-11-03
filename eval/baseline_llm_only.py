@@ -15,6 +15,7 @@ Requires a valid LLM API key in .env (GEMINI_API_KEY / OPENAI_API_KEY / CLAUDE_A
 
 from __future__ import annotations
 
+import argparse
 import json
 import sys
 import time
@@ -62,7 +63,7 @@ MESSAGES ABOUT THIS DRIVE:
 Based on the above, is this student ELIGIBLE, INELIGIBLE, or UNKNOWN?"""
 
 
-def run_baseline() -> None:
+def run_baseline(case_ids: set[str] | None = None, limit: int | None = None) -> None:
     from eval.run_eval import _load_source_index  # local import avoids a cycle at module load
 
     students_raw = json.loads(STUDENTS_FILE.read_text(encoding="utf-8"))
@@ -70,6 +71,10 @@ def run_baseline() -> None:
 
     source_index = _load_source_index()
     gold_cases = json.loads(GOLD_SET_FILE.read_text(encoding="utf-8"))
+    if case_ids:
+        gold_cases = [c for c in gold_cases if c["case_id"] in case_ids]
+    if limit:
+        gold_cases = gold_cases[:limit]
 
     try:
         llm = get_llm_client()
@@ -143,4 +148,9 @@ def run_baseline() -> None:
 
 
 if __name__ == "__main__":
-    run_baseline()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--cases", type=str, default=None, help="Comma-separated case_ids to run.")
+    parser.add_argument("--limit", type=int, default=None, help="Only run the first N cases.")
+    args = parser.parse_args()
+    case_ids = set(args.cases.split(",")) if args.cases else None
+    run_baseline(case_ids=case_ids, limit=args.limit)
