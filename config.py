@@ -23,10 +23,12 @@ class Settings(BaseSettings):
     ollama_base_url: str = "http://localhost:11434"
     ollama_model: str = "llama3.1:8b"
     ollama_temperature: float = 0.1
+    ollama_timeout: int = 120  # seconds; bounds a stuck/slow local model instead of hanging forever
+    extraction_min_confidence: str = "medium"  # high | medium | low - facts below this are held for review, not auto-applied
     
     # Gemini settings
     gemini_api_key: str | None = None
-    gemini_model: str = "models/gemini-1.5-flash"  # Full model path for LangChain
+    gemini_model: str = "gemini-flash-latest"  # generic alias Google keeps pointed at a current, available flash model
     gemini_temperature: float = 0.1  # Low temperature for deterministic extraction
     gemini_max_retries: int = 3
     gemini_timeout: int = 30  # seconds
@@ -56,7 +58,18 @@ class Settings(BaseSettings):
     gmail_polling_enabled: bool = True  # Enable automatic email polling
     gmail_polling_interval_minutes: int = 60  # Polling interval in minutes (default: 1 hour)
     gmail_processed_label: str = "PlaceGuard/Processed"  # Gmail label for processed emails
-    
+
+    # Vector store / RAG (retrieval only - never used for the eligibility decision)
+    vector_store_enabled: bool = True
+    vector_store_type: str = "chromadb"  # or "faiss"
+    vector_store_path: str = "./data/chroma_db"
+    embedding_model: str = "all-MiniLM-L6-v2"
+    embedding_dimension: int = 384  # 384 for MiniLM, 768 for mpnet
+    embedding_batch_size: int = 32
+    rag_top_k: int = 20  # Number of results from vector search
+    rag_similarity_threshold: float = 0.7  # Minimum similarity score
+    rag_fallback_to_sql: bool = True  # Always use SQL as safety net
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

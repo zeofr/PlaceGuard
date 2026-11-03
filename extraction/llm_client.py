@@ -209,6 +209,7 @@ def get_llm_client(provider: str | None = None) -> LLMClient:
             model=settings.ollama_model,
             base_url=settings.ollama_base_url,
             temperature=settings.ollama_temperature,
+            client_kwargs={"timeout": settings.ollama_timeout},
         )
         
         return LangChainClient(

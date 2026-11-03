@@ -118,7 +118,14 @@ class GmailAdapter(SourceAdapter):
                     # Log error but continue with other messages
                     print(f"Warning: Failed to fetch message {msg_id}: {e}")
                     continue
-            
+
+            # Gmail's "after:" query is date-granularity only (no time of day),
+            # so it can over-fetch by up to a day depending on when this runs
+            # (see _build_query). Enforce the precise window here.
+            if self.days_back > 0:
+                cutoff = datetime.utcnow() - timedelta(days=self.days_back)
+                messages = [m for m in messages if m.timestamp >= cutoff]
+
             return messages
         
         except HttpError as e:
@@ -145,11 +152,16 @@ class GmailAdapter(SourceAdapter):
         if only_unread:
             query_parts.append("is:unread")
         
-        # Add date filter (last N days)
+        # Add date filter (last N days). Gmail's "after:" only takes a date
+        # (no time of day), so it can't express an exact N-day-ago instant -
+        # querying the exact cutoff date would risk UNDER-fetching (e.g. running
+        # at 9am would exclude today's early-morning mail from "yesterday's"
+        # bucket). Widen by one extra day here; fetch() enforces the precise
+        # cutoff afterwards against each message's actual timestamp.
         if self.days_back > 0:
             # Gmail uses YYYY/MM/DD format for dates
-            cutoff_date = datetime.utcnow() - timedelta(days=self.days_back)
-            date_str = cutoff_date.strftime("%Y/%m/%d")
+            query_cutoff_date = datetime.utcnow() - timedelta(days=self.days_back + 1)
+            date_str = query_cutoff_date.strftime("%Y/%m/%d")
             query_parts.append(f"after:{date_str}")
         
         return " ".join(query_parts)

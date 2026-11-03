@@ -1,180 +1,3667 @@
 [
   {
     "case_id": "CASE_001",
-    "description": "Eligible student for TechCorp (all criteria met, post-correction CGPA 7.0)",
-    "drive_id": "DRIVE_TECHCORP",
-    "student_id": "S002",
-    "notices_in_scope": ["N001", "N002", "N003", "N004"],
+    "description": "WhatsApp correction lowers CGPA to 7.0; old forward (rank5) must be ignored.",
+    "drive_id": "DRIVE_VERTEXSOFT",
+    "student_id": "1MS22CS001",
+    "notices_in_scope": [
+      "email_vertexsoft_001",
+      "whatsapp_vertexsoft_001",
+      "student_whatsapp_vertexsoft_001"
+    ],
     "expected_current_rules": {
-      "min_cgpa": {"operator": "gte", "value": 7.0, "authoritative_source": "msg_techcorp_002"},
-      "allowed_branches": {"operator": "in", "value": ["CSE", "ISE"], "authoritative_source": "msg_techcorp_001"},
-      "max_backlogs": {"operator": "eq", "value": 0, "authoritative_source": "msg_techcorp_001"},
-      "min_10th_pct": {"operator": "gte", "value": 60.0, "authoritative_source": "msg_techcorp_001"},
-      "min_12th_pct": {"operator": "gte", "value": 60.0, "authoritative_source": "msg_techcorp_001"}
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.0,
+        "authoritative_source": "whatsapp_vertexsoft_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE"
+        ],
+        "authoritative_source": "whatsapp_vertexsoft_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "whatsapp_vertexsoft_001"
+      }
     },
     "expected_eligibility": "ELIGIBLE",
     "expected_unknown": false,
     "temporal_reasoning_required": true,
-    "notes": "CGPA correction (7.5→7.0) from same authority (placement_cell_whatsapp) must be applied. Student forward with old 7.5 CGPA must be ignored. Deadline extension does not affect eligibility."
+    "provenance_reasoning_required": true,
+    "category": "temporal_conflict",
+    "notes": "Rank-2 WhatsApp correction beats rank-2 email on is_correction; rank-5 forward never wins; backlogs/branches resolve to the chronologically latest rank-2 restatement."
   },
   {
     "case_id": "CASE_002",
-    "description": "Ineligible: student has prior offer (TechCorp)",
-    "drive_id": "DRIVE_TECHCORP",
-    "student_id": "S004",
-    "notices_in_scope": ["N001", "N002"],
+    "description": "Fails CGPA, branch, and backlog criteria simultaneously.",
+    "drive_id": "DRIVE_VERTEXSOFT",
+    "student_id": "1MS22EC005",
+    "notices_in_scope": [
+      "email_vertexsoft_001",
+      "whatsapp_vertexsoft_001",
+      "student_whatsapp_vertexsoft_001"
+    ],
     "expected_current_rules": {
-      "min_cgpa": {"operator": "gte", "value": 7.0, "authoritative_source": "msg_techcorp_002"},
-      "allowed_branches": {"operator": "in", "value": ["CSE", "ISE"]}
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.0,
+        "authoritative_source": "whatsapp_vertexsoft_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE"
+        ],
+        "authoritative_source": "whatsapp_vertexsoft_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "whatsapp_vertexsoft_001"
+      }
     },
     "expected_eligibility": "INELIGIBLE",
     "expected_unknown": false,
     "temporal_reasoning_required": false,
-    "notes": "S004 has has_prior_offer=true. Even though CGPA 9.1 and branch CSE are fine, the no_prior_offer criterion fails."
+    "provenance_reasoning_required": false,
+    "category": "multi_condition",
+    "notes": ""
   },
   {
     "case_id": "CASE_003",
-    "description": "UNKNOWN: student CGPA missing (S008)",
-    "drive_id": "DRIVE_TECHCORP",
-    "student_id": "S008",
-    "notices_in_scope": ["N001", "N002"],
+    "description": "CGPA exactly at the corrected 7.0 boundary (gte passes).",
+    "drive_id": "DRIVE_VERTEXSOFT",
+    "student_id": "1MS22CS035",
+    "notices_in_scope": [
+      "email_vertexsoft_001",
+      "whatsapp_vertexsoft_001",
+      "student_whatsapp_vertexsoft_001"
+    ],
     "expected_current_rules": {
-      "min_cgpa": {"operator": "gte", "value": 7.0, "authoritative_source": "msg_techcorp_002"}
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.0,
+        "authoritative_source": "whatsapp_vertexsoft_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE"
+        ],
+        "authoritative_source": "whatsapp_vertexsoft_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "whatsapp_vertexsoft_001"
+      }
     },
-    "expected_eligibility": "UNKNOWN",
-    "expected_unknown": true,
-    "temporal_reasoning_required": false,
-    "notes": "S008 has cgpa=null. min_cgpa criterion must return UNKNOWN, not FAIL. No FAIL criteria exist, so overall is UNKNOWN."
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": true,
+    "provenance_reasoning_required": false,
+    "category": "temporal_conflict",
+    "notes": ""
   },
   {
     "case_id": "CASE_004",
-    "description": "High-authority PDF overrides coordinator notice for DataSystems",
-    "drive_id": "DRIVE_DATASYSTEMS",
-    "student_id": "S003",
-    "notices_in_scope": ["N005", "N006"],
+    "description": "Both CGPA and backlogs are null -> UNKNOWN.",
+    "drive_id": "DRIVE_VERTEXSOFT",
+    "student_id": "1MS22CS037",
+    "notices_in_scope": [
+      "email_vertexsoft_001",
+      "whatsapp_vertexsoft_001",
+      "student_whatsapp_vertexsoft_001"
+    ],
     "expected_current_rules": {
-      "min_cgpa": {"operator": "gte", "value": 7.5, "authoritative_source": "msg_datasystems_002"},
-      "allowed_branches": {"operator": "in", "value": ["CSE", "ISE", "ECE"], "authoritative_source": "msg_datasystems_002"},
-      "max_backlogs": {"operator": "eq", "value": 0, "authoritative_source": "msg_datasystems_002"}
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.0,
+        "authoritative_source": "whatsapp_vertexsoft_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE"
+        ],
+        "authoritative_source": "whatsapp_vertexsoft_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "whatsapp_vertexsoft_001"
+      }
     },
-    "expected_eligibility": "INELIGIBLE",
-    "expected_unknown": false,
+    "expected_eligibility": "UNKNOWN",
+    "expected_unknown": true,
     "temporal_reasoning_required": false,
-    "provenance_reasoning_required": true,
-    "notes": "Coordinator said CGPA 7.0 and all branches with max 2 backlogs. Official PDF (rank 1) overrides to CGPA 7.5, CSE/ISE/ECE only, no backlogs. S003 has CGPA 6.9 → INELIGIBLE on CGPA. Also has 1 backlog which fails the PDF's 0-backlog requirement."
+    "provenance_reasoning_required": false,
+    "category": "missing_info",
+    "notes": ""
   },
   {
     "case_id": "CASE_005",
-    "description": "Official placement cell overrides student rumor for InnovateLabs",
-    "drive_id": "DRIVE_INNOVATELABS",
-    "student_id": "S001",
-    "notices_in_scope": ["N007", "N008"],
+    "description": "Comfortably eligible padding case.",
+    "drive_id": "DRIVE_VERTEXSOFT",
+    "student_id": "1MS22CS041",
+    "notices_in_scope": [
+      "email_vertexsoft_001",
+      "whatsapp_vertexsoft_001",
+      "student_whatsapp_vertexsoft_001"
+    ],
     "expected_current_rules": {
-      "min_cgpa": {"operator": "gte", "value": 8.5, "authoritative_source": "msg_innovate_002"},
-      "allowed_branches": {"operator": "in", "value": ["CSE", "ISE", "ECE"], "authoritative_source": "msg_innovate_002"},
-      "max_backlogs": {"operator": "eq", "value": 0, "authoritative_source": "msg_innovate_002"}
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.0,
+        "authoritative_source": "whatsapp_vertexsoft_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE"
+        ],
+        "authoritative_source": "whatsapp_vertexsoft_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "whatsapp_vertexsoft_001"
+      }
     },
     "expected_eligibility": "ELIGIBLE",
     "expected_unknown": false,
     "temporal_reasoning_required": false,
-    "provenance_reasoning_required": true,
-    "notes": "Student message said CGPA 8.0, placement cell said 8.5. Authority rank 2 overrides rank 5. S001 CGPA 8.72 passes. Branch CSE, 0 backlogs, no prior offer — all pass."
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
   },
   {
     "case_id": "CASE_006",
-    "description": "Three-update chain: QuickByte final state is CGPA 8.0, CSE only, deadline 6 Nov",
-    "drive_id": "DRIVE_QUICKBYTE",
-    "student_id": "S001",
-    "notices_in_scope": ["N015", "N016", "N017", "N018"],
+    "description": "Official PDF (rank1) beats conflicting coordinator rumor (rank3).",
+    "drive_id": "DRIVE_BRIGHTWAVE",
+    "student_id": "1MS22CS020",
+    "notices_in_scope": [
+      "pdf_brightwave_001",
+      "coordinator_whatsapp_brightwave_001"
+    ],
     "expected_current_rules": {
-      "min_cgpa": {"operator": "gte", "value": 8.0, "authoritative_source": "msg_quickbyte_003"},
-      "allowed_branches": {"operator": "in", "value": ["CSE"], "authoritative_source": "msg_quickbyte_003"},
-      "max_backlogs": {"operator": "eq", "value": 0, "authoritative_source": "msg_quickbyte_001"}
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.5,
+        "authoritative_source": "pdf_brightwave_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE"
+        ],
+        "authoritative_source": "pdf_brightwave_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "pdf_brightwave_001"
+      }
     },
     "expected_eligibility": "ELIGIBLE",
     "expected_unknown": false,
-    "temporal_reasoning_required": true,
+    "temporal_reasoning_required": false,
     "provenance_reasoning_required": true,
-    "notes": "Three same-authority updates. Final state: CGPA 8.0 (N017 correction beats N015 7.5), branches CSE only (N017 beats N015 multi-branch), deadline 6 Nov (N016 beats N015). Student forward N018 restating old values must be ignored (rank 5 vs rank 2). S001 CGPA 8.72, branch CSE, 0 backlogs — ELIGIBLE."
+    "category": "conflicting_sources",
+    "notes": ""
   },
   {
     "case_id": "CASE_007",
-    "description": "Ineligible branch for QuickByte after correction",
-    "drive_id": "DRIVE_QUICKBYTE",
-    "student_id": "S007",
-    "notices_in_scope": ["N015", "N016", "N017", "N018"],
+    "description": "Would be ELIGIBLE under the rumor's rules; INELIGIBLE under the real PDF.",
+    "drive_id": "DRIVE_BRIGHTWAVE",
+    "student_id": "1MS22EC005",
+    "notices_in_scope": [
+      "pdf_brightwave_001",
+      "coordinator_whatsapp_brightwave_001"
+    ],
     "expected_current_rules": {
-      "allowed_branches": {"operator": "in", "value": ["CSE"], "authoritative_source": "msg_quickbyte_003"}
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.5,
+        "authoritative_source": "pdf_brightwave_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE"
+        ],
+        "authoritative_source": "pdf_brightwave_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "pdf_brightwave_001"
+      }
     },
     "expected_eligibility": "INELIGIBLE",
     "expected_unknown": false,
-    "temporal_reasoning_required": true,
-    "notes": "S007 is ECE branch. After N017 correction restricts to CSE only, S007 is INELIGIBLE on branch even though the original N015 allowed CSE/ISE/ECE."
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": true,
+    "category": "conflicting_sources",
+    "notes": ""
   },
   {
     "case_id": "CASE_008",
-    "description": "UNKNOWN: backlogs field missing for S009",
-    "drive_id": "DRIVE_TECHCORP",
-    "student_id": "S009",
-    "notices_in_scope": ["N001", "N002"],
-    "expected_eligibility": "UNKNOWN",
-    "expected_unknown": true,
-    "temporal_reasoning_required": false,
-    "notes": "S009 has backlogs=null. No FAIL criteria, so overall is UNKNOWN (not INELIGIBLE). System must not assume backlogs=0."
-  },
-  {
-    "case_id": "CASE_009",
-    "description": "INELIGIBLE on CGPA (below threshold) for NexGen",
-    "drive_id": "DRIVE_NEXGEN",
-    "student_id": "S010",
-    "notices_in_scope": ["N013"],
+    "description": "Narrow CGPA miss (7.45 < 7.5) -- authority still decides, not recency.",
+    "drive_id": "DRIVE_BRIGHTWAVE",
+    "student_id": "1MS22IS004",
+    "notices_in_scope": [
+      "pdf_brightwave_001",
+      "coordinator_whatsapp_brightwave_001"
+    ],
     "expected_current_rules": {
-      "min_cgpa": {"operator": "gte", "value": 8.0, "authoritative_source": "msg_nexgen_001"}
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.5,
+        "authoritative_source": "pdf_brightwave_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE"
+        ],
+        "authoritative_source": "pdf_brightwave_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "pdf_brightwave_001"
+      }
     },
     "expected_eligibility": "INELIGIBLE",
     "expected_unknown": false,
     "temporal_reasoning_required": false,
-    "notes": "S010 CGPA 7.2 < 8.0 minimum. Branch CSE matches. Backlogs 0 OK. 10th 72% >= 70% OK. 12th 68.5% < 70% also fails. Both min_cgpa and min_12th_pct should FAIL."
+    "provenance_reasoning_required": true,
+    "category": "conflicting_sources",
+    "notes": ""
   },
   {
-    "case_id": "CASE_010",
-    "description": "UNKNOWN: 12th percentage missing for S015 on NexGen",
-    "drive_id": "DRIVE_NEXGEN",
-    "student_id": "S015",
-    "notices_in_scope": ["N013"],
-    "expected_eligibility": "UNKNOWN",
-    "expected_unknown": true,
-    "temporal_reasoning_required": false,
-    "notes": "S015 twelfth_pct=null. CGPA 8.10 passes, branch CSE passes, backlogs 0 passes, 10th 82% passes. But 12th_pct unknown → overall UNKNOWN because we cannot confirm all criteria."
-  },
-  {
-    "case_id": "CASE_011",
-    "description": "Eligible for SoftEdge (open to all, low bar)",
-    "drive_id": "DRIVE_SOFTEDGE",
-    "student_id": "S012",
-    "notices_in_scope": ["N014"],
+    "case_id": "CASE_009",
+    "description": "Comfortably eligible padding case.",
+    "drive_id": "DRIVE_BRIGHTWAVE",
+    "student_id": "1MS22CS038",
+    "notices_in_scope": [
+      "pdf_brightwave_001",
+      "coordinator_whatsapp_brightwave_001"
+    ],
     "expected_current_rules": {
-      "min_cgpa": {"operator": "gte", "value": 6.0, "authoritative_source": "msg_softedge_001"}
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.5,
+        "authoritative_source": "pdf_brightwave_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE"
+        ],
+        "authoritative_source": "pdf_brightwave_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "pdf_brightwave_001"
+      }
     },
     "expected_eligibility": "ELIGIBLE",
     "expected_unknown": false,
     "temporal_reasoning_required": false,
-    "notes": "SoftEdge has minimal criteria: CGPA 6.0, all branches, no backlog or offer restriction. S012 CGPA 6.5, CIVIL, 3 backlogs but no backlog restriction stated. Should be ELIGIBLE for min_cgpa criterion."
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
   },
   {
-    "case_id": "CASE_012",
-    "description": "TechCorp V2: official PDF (rank 1) overrides WhatsApp (rank 2)",
-    "drive_id": "DRIVE_TECHCORP_V2",
-    "student_id": "S003",
-    "notices_in_scope": ["N011", "N012"],
+    "case_id": "CASE_010",
+    "description": "Email (rank2) beats stale portal (rank4) and student rumor (rank5).",
+    "drive_id": "DRIVE_CLOUDPEAK",
+    "student_id": "1MS22EC042",
+    "notices_in_scope": [
+      "email_cloudpeak_001",
+      "portal_SIS_CLOUDPEAK_001",
+      "student_whatsapp_cloudpeak_001"
+    ],
     "expected_current_rules": {
-      "min_cgpa": {"operator": "gte", "value": 7.5, "authoritative_source": "msg_techcorpv2_002"},
-      "allowed_branches": {"operator": "in", "value": ["CSE", "ISE"], "authoritative_source": "msg_techcorpv2_002"},
-      "max_backlogs": {"operator": "eq", "value": 0, "authoritative_source": "msg_techcorpv2_002"}
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.5,
+        "authoritative_source": "email_cloudpeak_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE",
+          "ECE"
+        ],
+        "authoritative_source": "email_cloudpeak_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_cloudpeak_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": true,
+    "provenance_reasoning_required": true,
+    "category": "temporal_conflict",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_011",
+    "description": "CGPA 7.4 < revised 7.5 requirement -- narrow miss.",
+    "drive_id": "DRIVE_CLOUDPEAK",
+    "student_id": "1MS22EC034",
+    "notices_in_scope": [
+      "email_cloudpeak_001",
+      "portal_SIS_CLOUDPEAK_001",
+      "student_whatsapp_cloudpeak_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.5,
+        "authoritative_source": "email_cloudpeak_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE",
+          "ECE"
+        ],
+        "authoritative_source": "email_cloudpeak_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_cloudpeak_001"
+      }
     },
     "expected_eligibility": "INELIGIBLE",
     "expected_unknown": false,
+    "temporal_reasoning_required": true,
+    "provenance_reasoning_required": false,
+    "category": "temporal_conflict",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_012",
+    "description": "Backlogs null -> UNKNOWN.",
+    "drive_id": "DRIVE_CLOUDPEAK",
+    "student_id": "1MS22IS009",
+    "notices_in_scope": [
+      "email_cloudpeak_001",
+      "portal_SIS_CLOUDPEAK_001",
+      "student_whatsapp_cloudpeak_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.5,
+        "authoritative_source": "email_cloudpeak_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE",
+          "ECE"
+        ],
+        "authoritative_source": "email_cloudpeak_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_cloudpeak_001"
+      }
+    },
+    "expected_eligibility": "UNKNOWN",
+    "expected_unknown": true,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "missing_info",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_013",
+    "description": "Comfortably eligible padding case.",
+    "drive_id": "DRIVE_CLOUDPEAK",
+    "student_id": "1MS22EC018",
+    "notices_in_scope": [
+      "email_cloudpeak_001",
+      "portal_SIS_CLOUDPEAK_001",
+      "student_whatsapp_cloudpeak_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.5,
+        "authoritative_source": "email_cloudpeak_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE",
+          "ECE"
+        ],
+        "authoritative_source": "email_cloudpeak_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_cloudpeak_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_014",
+    "description": "Backlog rule relaxed by WhatsApp correction (0 -> 2).",
+    "drive_id": "DRIVE_ORBITALTECH",
+    "student_id": "1MS22CS038",
+    "notices_in_scope": [
+      "email_orbitaltech_001",
+      "whatsapp_orbitaltech_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 8.0,
+        "authoritative_source": "email_orbitaltech_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE",
+          "ECE",
+          "EEE"
+        ],
+        "authoritative_source": "email_orbitaltech_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 2,
+        "authoritative_source": "whatsapp_orbitaltech_001"
+      },
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 70,
+        "authoritative_source": "email_orbitaltech_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 70,
+        "authoritative_source": "email_orbitaltech_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": true,
+    "provenance_reasoning_required": false,
+    "category": "temporal_conflict",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_015",
+    "description": "Fails CGPA and branch (ETE not listed).",
+    "drive_id": "DRIVE_ORBITALTECH",
+    "student_id": "1MS22ET023",
+    "notices_in_scope": [
+      "email_orbitaltech_001",
+      "whatsapp_orbitaltech_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 8.0,
+        "authoritative_source": "email_orbitaltech_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE",
+          "ECE",
+          "EEE"
+        ],
+        "authoritative_source": "email_orbitaltech_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 2,
+        "authoritative_source": "whatsapp_orbitaltech_001"
+      },
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 70,
+        "authoritative_source": "email_orbitaltech_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 70,
+        "authoritative_source": "email_orbitaltech_001"
+      }
+    },
+    "expected_eligibility": "INELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "multi_condition",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_016",
+    "description": "Backlogs=2 passes the relaxed rule exactly at the boundary; fails on CGPA only.",
+    "drive_id": "DRIVE_ORBITALTECH",
+    "student_id": "1MS22IS036",
+    "notices_in_scope": [
+      "email_orbitaltech_001",
+      "whatsapp_orbitaltech_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 8.0,
+        "authoritative_source": "email_orbitaltech_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE",
+          "ECE",
+          "EEE"
+        ],
+        "authoritative_source": "email_orbitaltech_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 2,
+        "authoritative_source": "whatsapp_orbitaltech_001"
+      },
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 70,
+        "authoritative_source": "email_orbitaltech_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 70,
+        "authoritative_source": "email_orbitaltech_001"
+      }
+    },
+    "expected_eligibility": "INELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": true,
+    "provenance_reasoning_required": false,
+    "category": "temporal_conflict",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_017",
+    "description": "Eligible under the relaxed backlog rule.",
+    "drive_id": "DRIVE_ORBITALTECH",
+    "student_id": "1MS22EC026",
+    "notices_in_scope": [
+      "email_orbitaltech_001",
+      "whatsapp_orbitaltech_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 8.0,
+        "authoritative_source": "email_orbitaltech_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE",
+          "ECE",
+          "EEE"
+        ],
+        "authoritative_source": "email_orbitaltech_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 2,
+        "authoritative_source": "whatsapp_orbitaltech_001"
+      },
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 70,
+        "authoritative_source": "email_orbitaltech_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 70,
+        "authoritative_source": "email_orbitaltech_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_018",
+    "description": "Comfortably eligible padding case.",
+    "drive_id": "DRIVE_ORBITALTECH",
+    "student_id": "1MS22CS024",
+    "notices_in_scope": [
+      "email_orbitaltech_001",
+      "whatsapp_orbitaltech_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 8.0,
+        "authoritative_source": "email_orbitaltech_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE",
+          "ECE",
+          "EEE"
+        ],
+        "authoritative_source": "email_orbitaltech_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 2,
+        "authoritative_source": "whatsapp_orbitaltech_001"
+      },
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 70,
+        "authoritative_source": "email_orbitaltech_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 70,
+        "authoritative_source": "email_orbitaltech_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_019",
+    "description": "WhatsApp correction adds ECE to the eligible branch list.",
+    "drive_id": "DRIVE_SILVERLINE",
+    "student_id": "1MS22EC042",
+    "notices_in_scope": [
+      "email_silverline_001",
+      "whatsapp_silverline_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.0,
+        "authoritative_source": "email_silverline_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE",
+          "ECE"
+        ],
+        "authoritative_source": "whatsapp_silverline_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_silverline_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": true,
+    "provenance_reasoning_required": false,
+    "category": "temporal_conflict",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_020",
+    "description": "CGPA 7.05, just above the 7.0 boundary.",
+    "drive_id": "DRIVE_SILVERLINE",
+    "student_id": "1MS22CS029",
+    "notices_in_scope": [
+      "email_silverline_001",
+      "whatsapp_silverline_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.0,
+        "authoritative_source": "email_silverline_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE",
+          "ECE"
+        ],
+        "authoritative_source": "whatsapp_silverline_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_silverline_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": true,
+    "provenance_reasoning_required": false,
+    "category": "temporal_conflict",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_021",
+    "description": "ETE not in the corrected branch list; also fails CGPA and backlogs.",
+    "drive_id": "DRIVE_SILVERLINE",
+    "student_id": "1MS22ET012",
+    "notices_in_scope": [
+      "email_silverline_001",
+      "whatsapp_silverline_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.0,
+        "authoritative_source": "email_silverline_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE",
+          "ECE"
+        ],
+        "authoritative_source": "whatsapp_silverline_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_silverline_001"
+      }
+    },
+    "expected_eligibility": "INELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "multi_condition",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_022",
+    "description": "Comfortably eligible padding case.",
+    "drive_id": "DRIVE_SILVERLINE",
+    "student_id": "1MS22IS025",
+    "notices_in_scope": [
+      "email_silverline_001",
+      "whatsapp_silverline_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.0,
+        "authoritative_source": "email_silverline_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE",
+          "ECE"
+        ],
+        "authoritative_source": "whatsapp_silverline_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_silverline_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_023",
+    "description": "ECE still eligible after the branch correction.",
+    "drive_id": "DRIVE_NIMBUSWORKS",
+    "student_id": "1MS22EC018",
+    "notices_in_scope": [
+      "email_nimbusworks_001",
+      "whatsapp_nimbusworks_001",
+      "student_whatsapp_nimbusworks_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 6.5,
+        "authoritative_source": "email_nimbusworks_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ECE"
+        ],
+        "authoritative_source": "whatsapp_nimbusworks_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_024",
+    "description": "ISE was removed by the official correction; the student-forwarded old email (listing ISE) must be ignored.",
+    "drive_id": "DRIVE_NIMBUSWORKS",
+    "student_id": "1MS22IS025",
+    "notices_in_scope": [
+      "email_nimbusworks_001",
+      "whatsapp_nimbusworks_001",
+      "student_whatsapp_nimbusworks_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 6.5,
+        "authoritative_source": "email_nimbusworks_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ECE"
+        ],
+        "authoritative_source": "whatsapp_nimbusworks_001"
+      }
+    },
+    "expected_eligibility": "INELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": true,
     "provenance_reasoning_required": true,
-    "notes": "WhatsApp (rank 2) said CGPA 7.0, all branches, max 1 backlog. Official PDF (rank 1) overrides: CGPA 7.5, CSE/ISE only, no backlogs. S003 ECE branch → INELIGIBLE on branch. Also CGPA 6.9 < 7.5 and has 1 backlog."
+    "category": "outdated_forwarded",
+    "notes": "Naive forward-trusting logic would wrongly say ELIGIBLE; correct answer is INELIGIBLE."
+  },
+  {
+    "case_id": "CASE_025",
+    "description": "ETE never eligible for this drive.",
+    "drive_id": "DRIVE_NIMBUSWORKS",
+    "student_id": "1MS22ET023",
+    "notices_in_scope": [
+      "email_nimbusworks_001",
+      "whatsapp_nimbusworks_001",
+      "student_whatsapp_nimbusworks_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 6.5,
+        "authoritative_source": "email_nimbusworks_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ECE"
+        ],
+        "authoritative_source": "whatsapp_nimbusworks_001"
+      }
+    },
+    "expected_eligibility": "INELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "multi_condition",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_026",
+    "description": "No backlog criterion was ever stated for this drive -- backlogs must not be checked.",
+    "drive_id": "DRIVE_NIMBUSWORKS",
+    "student_id": "1MS22CS016",
+    "notices_in_scope": [
+      "email_nimbusworks_001",
+      "whatsapp_nimbusworks_001",
+      "student_whatsapp_nimbusworks_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 6.5,
+        "authoritative_source": "email_nimbusworks_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ECE"
+        ],
+        "authoritative_source": "whatsapp_nimbusworks_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_027",
+    "description": "Meets all 5 criteria.",
+    "drive_id": "DRIVE_PRISMATIC",
+    "student_id": "1MS22CS013",
+    "notices_in_scope": [
+      "email_prismatic_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 8.5,
+        "authoritative_source": "email_prismatic_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE",
+          "ECE",
+          "EEE"
+        ],
+        "authoritative_source": "email_prismatic_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_prismatic_001"
+      },
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 75,
+        "authoritative_source": "email_prismatic_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 75,
+        "authoritative_source": "email_prismatic_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "multi_condition",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_028",
+    "description": "Fails CGPA, 10th%, and 12th% simultaneously.",
+    "drive_id": "DRIVE_PRISMATIC",
+    "student_id": "1MS22CS007",
+    "notices_in_scope": [
+      "email_prismatic_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 8.5,
+        "authoritative_source": "email_prismatic_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE",
+          "ECE",
+          "EEE"
+        ],
+        "authoritative_source": "email_prismatic_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_prismatic_001"
+      },
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 75,
+        "authoritative_source": "email_prismatic_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 75,
+        "authoritative_source": "email_prismatic_001"
+      }
+    },
+    "expected_eligibility": "INELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "multi_condition",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_029",
+    "description": "EIE is not in the allowed branch list.",
+    "drive_id": "DRIVE_PRISMATIC",
+    "student_id": "1MS22EI030",
+    "notices_in_scope": [
+      "email_prismatic_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 8.5,
+        "authoritative_source": "email_prismatic_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE",
+          "ECE",
+          "EEE"
+        ],
+        "authoritative_source": "email_prismatic_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_prismatic_001"
+      },
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 75,
+        "authoritative_source": "email_prismatic_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 75,
+        "authoritative_source": "email_prismatic_001"
+      }
+    },
+    "expected_eligibility": "INELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "multi_condition",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_030",
+    "description": "CGPA 8.35 < 8.5 -- narrow miss.",
+    "drive_id": "DRIVE_PRISMATIC",
+    "student_id": "1MS22EC026",
+    "notices_in_scope": [
+      "email_prismatic_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 8.5,
+        "authoritative_source": "email_prismatic_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE",
+          "ECE",
+          "EEE"
+        ],
+        "authoritative_source": "email_prismatic_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_prismatic_001"
+      },
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 75,
+        "authoritative_source": "email_prismatic_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 75,
+        "authoritative_source": "email_prismatic_001"
+      }
+    },
+    "expected_eligibility": "INELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "multi_condition",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_031",
+    "description": "Comfortably eligible padding case.",
+    "drive_id": "DRIVE_PRISMATIC",
+    "student_id": "1MS22CS038",
+    "notices_in_scope": [
+      "email_prismatic_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 8.5,
+        "authoritative_source": "email_prismatic_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE",
+          "ECE",
+          "EEE"
+        ],
+        "authoritative_source": "email_prismatic_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_prismatic_001"
+      },
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 75,
+        "authoritative_source": "email_prismatic_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 75,
+        "authoritative_source": "email_prismatic_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_032",
+    "description": "Branch string 'CSE(AI&ML)' is NOT the same string as 'CSE' -- precision test.",
+    "drive_id": "DRIVE_QUANTUMEDGE",
+    "student_id": "1MS22CI015",
+    "notices_in_scope": [
+      "pdf_quantumedge_001",
+      "portal_SIS_QUANTUMEDGE_001",
+      "student_whatsapp_quantumedge_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.0,
+        "authoritative_source": "pdf_quantumedge_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE"
+        ],
+        "authoritative_source": "pdf_quantumedge_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "pdf_quantumedge_001"
+      }
+    },
+    "expected_eligibility": "INELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": true,
+    "category": "conflicting_sources",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_033",
+    "description": "PDF wins over portal's 'open to all' and the rumor's CGPA 6.0, regardless of recency.",
+    "drive_id": "DRIVE_QUANTUMEDGE",
+    "student_id": "1MS22IS017",
+    "notices_in_scope": [
+      "pdf_quantumedge_001",
+      "portal_SIS_QUANTUMEDGE_001",
+      "student_whatsapp_quantumedge_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.0,
+        "authoritative_source": "pdf_quantumedge_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE"
+        ],
+        "authoritative_source": "pdf_quantumedge_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "pdf_quantumedge_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": true,
+    "category": "conflicting_sources",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_034",
+    "description": "Fails CGPA and backlog under the authoritative PDF rule.",
+    "drive_id": "DRIVE_QUANTUMEDGE",
+    "student_id": "1MS22CS016",
+    "notices_in_scope": [
+      "pdf_quantumedge_001",
+      "portal_SIS_QUANTUMEDGE_001",
+      "student_whatsapp_quantumedge_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.0,
+        "authoritative_source": "pdf_quantumedge_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE"
+        ],
+        "authoritative_source": "pdf_quantumedge_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "pdf_quantumedge_001"
+      }
+    },
+    "expected_eligibility": "INELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": true,
+    "category": "conflicting_sources",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_035",
+    "description": "Comfortably eligible padding case.",
+    "drive_id": "DRIVE_QUANTUMEDGE",
+    "student_id": "1MS22CS041",
+    "notices_in_scope": [
+      "pdf_quantumedge_001",
+      "portal_SIS_QUANTUMEDGE_001",
+      "student_whatsapp_quantumedge_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.0,
+        "authoritative_source": "pdf_quantumedge_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE"
+        ],
+        "authoritative_source": "pdf_quantumedge_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "pdf_quantumedge_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_036",
+    "description": "CGPA and backlogs both null -> UNKNOWN.",
+    "drive_id": "DRIVE_HALCYON",
+    "student_id": "1MS22CS037",
+    "notices_in_scope": [
+      "email_halcyon_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.0,
+        "authoritative_source": "email_halcyon_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE",
+          "ECE",
+          "MECH"
+        ],
+        "authoritative_source": "email_halcyon_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_halcyon_001"
+      },
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 65,
+        "authoritative_source": "email_halcyon_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 65,
+        "authoritative_source": "email_halcyon_001"
+      },
+      "no_prior_offer": {
+        "operator": "eq",
+        "value": false,
+        "authoritative_source": "email_halcyon_001"
+      }
+    },
+    "expected_eligibility": "UNKNOWN",
+    "expected_unknown": true,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "missing_info",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_037",
+    "description": "has_prior_offer is null -> UNKNOWN.",
+    "drive_id": "DRIVE_HALCYON",
+    "student_id": "1MS22IS032",
+    "notices_in_scope": [
+      "email_halcyon_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.0,
+        "authoritative_source": "email_halcyon_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE",
+          "ECE",
+          "MECH"
+        ],
+        "authoritative_source": "email_halcyon_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_halcyon_001"
+      },
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 65,
+        "authoritative_source": "email_halcyon_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 65,
+        "authoritative_source": "email_halcyon_001"
+      },
+      "no_prior_offer": {
+        "operator": "eq",
+        "value": false,
+        "authoritative_source": "email_halcyon_001"
+      }
+    },
+    "expected_eligibility": "UNKNOWN",
+    "expected_unknown": true,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "missing_info",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_038",
+    "description": "10th% is null -> UNKNOWN.",
+    "drive_id": "DRIVE_HALCYON",
+    "student_id": "1MS22CS033",
+    "notices_in_scope": [
+      "email_halcyon_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.0,
+        "authoritative_source": "email_halcyon_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE",
+          "ECE",
+          "MECH"
+        ],
+        "authoritative_source": "email_halcyon_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_halcyon_001"
+      },
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 65,
+        "authoritative_source": "email_halcyon_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 65,
+        "authoritative_source": "email_halcyon_001"
+      },
+      "no_prior_offer": {
+        "operator": "eq",
+        "value": false,
+        "authoritative_source": "email_halcyon_001"
+      }
+    },
+    "expected_eligibility": "UNKNOWN",
+    "expected_unknown": true,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "missing_info",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_039",
+    "description": "12th% is null -> UNKNOWN.",
+    "drive_id": "DRIVE_HALCYON",
+    "student_id": "1MS22EC034",
+    "notices_in_scope": [
+      "email_halcyon_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.0,
+        "authoritative_source": "email_halcyon_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE",
+          "ECE",
+          "MECH"
+        ],
+        "authoritative_source": "email_halcyon_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_halcyon_001"
+      },
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 65,
+        "authoritative_source": "email_halcyon_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 65,
+        "authoritative_source": "email_halcyon_001"
+      },
+      "no_prior_offer": {
+        "operator": "eq",
+        "value": false,
+        "authoritative_source": "email_halcyon_001"
+      }
+    },
+    "expected_eligibility": "UNKNOWN",
+    "expected_unknown": true,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "missing_info",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_040",
+    "description": "Branch not listed (CSE(AI&ML)) AND has an existing prior offer.",
+    "drive_id": "DRIVE_HALCYON",
+    "student_id": "1MS22CI039",
+    "notices_in_scope": [
+      "email_halcyon_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.0,
+        "authoritative_source": "email_halcyon_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE",
+          "ECE",
+          "MECH"
+        ],
+        "authoritative_source": "email_halcyon_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_halcyon_001"
+      },
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 65,
+        "authoritative_source": "email_halcyon_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 65,
+        "authoritative_source": "email_halcyon_001"
+      },
+      "no_prior_offer": {
+        "operator": "eq",
+        "value": false,
+        "authoritative_source": "email_halcyon_001"
+      }
+    },
+    "expected_eligibility": "INELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "multi_condition",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_041",
+    "description": "Fails CGPA, backlogs, 10th%, and 12th% simultaneously.",
+    "drive_id": "DRIVE_HALCYON",
+    "student_id": "1MS22ME040",
+    "notices_in_scope": [
+      "email_halcyon_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.0,
+        "authoritative_source": "email_halcyon_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE",
+          "ECE",
+          "MECH"
+        ],
+        "authoritative_source": "email_halcyon_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_halcyon_001"
+      },
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 65,
+        "authoritative_source": "email_halcyon_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 65,
+        "authoritative_source": "email_halcyon_001"
+      },
+      "no_prior_offer": {
+        "operator": "eq",
+        "value": false,
+        "authoritative_source": "email_halcyon_001"
+      }
+    },
+    "expected_eligibility": "INELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "multi_condition",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_042",
+    "description": "Comfortably eligible padding case.",
+    "drive_id": "DRIVE_HALCYON",
+    "student_id": "1MS22ME010",
+    "notices_in_scope": [
+      "email_halcyon_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.0,
+        "authoritative_source": "email_halcyon_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE",
+          "ECE",
+          "MECH"
+        ],
+        "authoritative_source": "email_halcyon_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_halcyon_001"
+      },
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 65,
+        "authoritative_source": "email_halcyon_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 65,
+        "authoritative_source": "email_halcyon_001"
+      },
+      "no_prior_offer": {
+        "operator": "eq",
+        "value": false,
+        "authoritative_source": "email_halcyon_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_043",
+    "description": "CGPA, 10th%, 12th% all sit exactly at their boundaries and pass.",
+    "drive_id": "DRIVE_FERROLINE",
+    "student_id": "1MS22CS041",
+    "notices_in_scope": [
+      "email_ferroline_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.65,
+        "authoritative_source": "email_ferroline_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE",
+          "ECE"
+        ],
+        "authoritative_source": "email_ferroline_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 2,
+        "authoritative_source": "email_ferroline_001"
+      },
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 60,
+        "authoritative_source": "email_ferroline_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 60,
+        "authoritative_source": "email_ferroline_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "multi_condition",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_044",
+    "description": "CGPA 7.55 narrow miss, and ETE not in the allowed branch list.",
+    "drive_id": "DRIVE_FERROLINE",
+    "student_id": "1MS22ET023",
+    "notices_in_scope": [
+      "email_ferroline_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.65,
+        "authoritative_source": "email_ferroline_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE",
+          "ECE"
+        ],
+        "authoritative_source": "email_ferroline_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 2,
+        "authoritative_source": "email_ferroline_001"
+      },
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 60,
+        "authoritative_source": "email_ferroline_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 60,
+        "authoritative_source": "email_ferroline_001"
+      }
+    },
+    "expected_eligibility": "INELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "multi_condition",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_045",
+    "description": "Backlogs=2 is exactly at the relaxed boundary and passes.",
+    "drive_id": "DRIVE_FERROLINE",
+    "student_id": "1MS22IS036",
+    "notices_in_scope": [
+      "email_ferroline_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.65,
+        "authoritative_source": "email_ferroline_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE",
+          "ECE"
+        ],
+        "authoritative_source": "email_ferroline_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 2,
+        "authoritative_source": "email_ferroline_001"
+      },
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 60,
+        "authoritative_source": "email_ferroline_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 60,
+        "authoritative_source": "email_ferroline_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "multi_condition",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_046",
+    "description": "Branch string 'CSE(AI&ML)' is not 'CSE' -- fails branch only.",
+    "drive_id": "DRIVE_FERROLINE",
+    "student_id": "1MS22CI027",
+    "notices_in_scope": [
+      "email_ferroline_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.65,
+        "authoritative_source": "email_ferroline_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE",
+          "ECE"
+        ],
+        "authoritative_source": "email_ferroline_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 2,
+        "authoritative_source": "email_ferroline_001"
+      },
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 60,
+        "authoritative_source": "email_ferroline_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 60,
+        "authoritative_source": "email_ferroline_001"
+      }
+    },
+    "expected_eligibility": "INELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "multi_condition",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_047",
+    "description": "CGPA exactly at the 6.5 boundary passes; fails on backlogs only.",
+    "drive_id": "DRIVE_AEROVANE",
+    "student_id": "1MS22ET012",
+    "notices_in_scope": [
+      "email_aerovane_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 6.5,
+        "authoritative_source": "email_aerovane_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_aerovane_001"
+      }
+    },
+    "expected_eligibility": "INELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_048",
+    "description": "Comfortably eligible; no branch restriction at all for this drive.",
+    "drive_id": "DRIVE_AEROVANE",
+    "student_id": "1MS22CS029",
+    "notices_in_scope": [
+      "email_aerovane_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 6.5,
+        "authoritative_source": "email_aerovane_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_aerovane_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_049",
+    "description": "Fails CGPA and backlogs.",
+    "drive_id": "DRIVE_AEROVANE",
+    "student_id": "1MS22ME040",
+    "notices_in_scope": [
+      "email_aerovane_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 6.5,
+        "authoritative_source": "email_aerovane_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_aerovane_001"
+      }
+    },
+    "expected_eligibility": "INELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_050",
+    "description": "Comfortably eligible padding case.",
+    "drive_id": "DRIVE_AEROVANE",
+    "student_id": "1MS22CS035",
+    "notices_in_scope": [
+      "email_aerovane_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 6.5,
+        "authoritative_source": "email_aerovane_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_aerovane_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_051",
+    "description": "Eligible CSE(AI&ML) student.",
+    "drive_id": "DRIVE_KPMG",
+    "student_id": "1MS22CI002",
+    "notices_in_scope": [
+      "email_kpmg_001"
+    ],
+    "expected_current_rules": {
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "CSE(AI&ML)",
+          "Cybersecurity"
+        ],
+        "authoritative_source": "email_kpmg_001"
+      },
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 60,
+        "authoritative_source": "email_kpmg_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 60,
+        "authoritative_source": "email_kpmg_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_kpmg_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_052",
+    "description": "ECE not listed; also fails 10th/12th/backlogs.",
+    "drive_id": "DRIVE_KPMG",
+    "student_id": "1MS22EC005",
+    "notices_in_scope": [
+      "email_kpmg_001"
+    ],
+    "expected_current_rules": {
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "CSE(AI&ML)",
+          "Cybersecurity"
+        ],
+        "authoritative_source": "email_kpmg_001"
+      },
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 60,
+        "authoritative_source": "email_kpmg_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 60,
+        "authoritative_source": "email_kpmg_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_kpmg_001"
+      }
+    },
+    "expected_eligibility": "INELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "multi_condition",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_053",
+    "description": "Eligible Cybersecurity student.",
+    "drive_id": "DRIVE_KPMG",
+    "student_id": "1MS22CY006",
+    "notices_in_scope": [
+      "email_kpmg_001"
+    ],
+    "expected_current_rules": {
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "CSE(AI&ML)",
+          "Cybersecurity"
+        ],
+        "authoritative_source": "email_kpmg_001"
+      },
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 60,
+        "authoritative_source": "email_kpmg_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 60,
+        "authoritative_source": "email_kpmg_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_kpmg_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_054",
+    "description": "10th% is null -> UNKNOWN.",
+    "drive_id": "DRIVE_KPMG",
+    "student_id": "1MS22CS033",
+    "notices_in_scope": [
+      "email_kpmg_001"
+    ],
+    "expected_current_rules": {
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "CSE(AI&ML)",
+          "Cybersecurity"
+        ],
+        "authoritative_source": "email_kpmg_001"
+      },
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 60,
+        "authoritative_source": "email_kpmg_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 60,
+        "authoritative_source": "email_kpmg_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_kpmg_001"
+      }
+    },
+    "expected_eligibility": "UNKNOWN",
+    "expected_unknown": true,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "missing_info",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_055",
+    "description": "Eligible CSE student.",
+    "drive_id": "DRIVE_KPMG",
+    "student_id": "1MS22CS001",
+    "notices_in_scope": [
+      "email_kpmg_001"
+    ],
+    "expected_current_rules": {
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "CSE(AI&ML)",
+          "Cybersecurity"
+        ],
+        "authoritative_source": "email_kpmg_001"
+      },
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 60,
+        "authoritative_source": "email_kpmg_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 60,
+        "authoritative_source": "email_kpmg_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_kpmg_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_056",
+    "description": "CGPA-only criterion, open to all branches.",
+    "drive_id": "DRIVE_BOEING",
+    "student_id": "1MS22ME010",
+    "notices_in_scope": [
+      "email_boeing_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.0,
+        "authoritative_source": "email_boeing_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_057",
+    "description": "CGPA 6.5 < 7.0.",
+    "drive_id": "DRIVE_BOEING",
+    "student_id": "1MS22ET012",
+    "notices_in_scope": [
+      "email_boeing_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.0,
+        "authoritative_source": "email_boeing_001"
+      }
+    },
+    "expected_eligibility": "INELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_058",
+    "description": "CGPA null -> UNKNOWN.",
+    "drive_id": "DRIVE_BOEING",
+    "student_id": "1MS22CS037",
+    "notices_in_scope": [
+      "email_boeing_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.0,
+        "authoritative_source": "email_boeing_001"
+      }
+    },
+    "expected_eligibility": "UNKNOWN",
+    "expected_unknown": true,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "missing_info",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_059",
+    "description": "CGPA 7.6, comfortably eligible.",
+    "drive_id": "DRIVE_BOEING",
+    "student_id": "1MS22IS032",
+    "notices_in_scope": [
+      "email_boeing_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.0,
+        "authoritative_source": "email_boeing_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_060",
+    "description": "Comfortably eligible padding case.",
+    "drive_id": "DRIVE_BOEING",
+    "student_id": "1MS22EI030",
+    "notices_in_scope": [
+      "email_boeing_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.0,
+        "authoritative_source": "email_boeing_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_061",
+    "description": "Email (rank2, CGPA 7.8) beats stale portal (rank4, CGPA 7.5).",
+    "drive_id": "DRIVE_NVIDIA",
+    "student_id": "1MS22EC026",
+    "notices_in_scope": [
+      "email_nvidia_001",
+      "portal_SIS_NVIDIA_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.8,
+        "authoritative_source": "email_nvidia_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ECE",
+          "EEE",
+          "EE"
+        ],
+        "authoritative_source": "email_nvidia_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": true,
+    "provenance_reasoning_required": true,
+    "category": "temporal_conflict",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_062",
+    "description": "CSE branch ok but CGPA 6.8 fails the real (higher) requirement.",
+    "drive_id": "DRIVE_NVIDIA",
+    "student_id": "1MS22CS016",
+    "notices_in_scope": [
+      "email_nvidia_001",
+      "portal_SIS_NVIDIA_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.8,
+        "authoritative_source": "email_nvidia_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ECE",
+          "EEE",
+          "EE"
+        ],
+        "authoritative_source": "email_nvidia_001"
+      }
+    },
+    "expected_eligibility": "INELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": true,
+    "provenance_reasoning_required": false,
+    "category": "temporal_conflict",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_063",
+    "description": "CGPA 8.6, comfortably above the real requirement.",
+    "drive_id": "DRIVE_NVIDIA",
+    "student_id": "1MS22EC042",
+    "notices_in_scope": [
+      "email_nvidia_001",
+      "portal_SIS_NVIDIA_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.8,
+        "authoritative_source": "email_nvidia_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ECE",
+          "EEE",
+          "EE"
+        ],
+        "authoritative_source": "email_nvidia_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": true,
+    "provenance_reasoning_required": false,
+    "category": "temporal_conflict",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_064",
+    "description": "CGPA null -> UNKNOWN.",
+    "drive_id": "DRIVE_NVIDIA",
+    "student_id": "1MS22CS037",
+    "notices_in_scope": [
+      "email_nvidia_001",
+      "portal_SIS_NVIDIA_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.8,
+        "authoritative_source": "email_nvidia_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ECE",
+          "EEE",
+          "EE"
+        ],
+        "authoritative_source": "email_nvidia_001"
+      }
+    },
+    "expected_eligibility": "UNKNOWN",
+    "expected_unknown": true,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "missing_info",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_065",
+    "description": "Eligible Cybersecurity student.",
+    "drive_id": "DRIVE_SCHNEIDER",
+    "student_id": "1MS22CY019",
+    "notices_in_scope": [
+      "email_schneider_001"
+    ],
+    "expected_current_rules": {
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 65,
+        "authoritative_source": "email_schneider_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 65,
+        "authoritative_source": "email_schneider_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_schneider_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "CSE(AI&ML)",
+          "Cybersecurity"
+        ],
+        "authoritative_source": "email_schneider_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_066",
+    "description": "Branch and percentage criteria all fail.",
+    "drive_id": "DRIVE_SCHNEIDER",
+    "student_id": "1MS22EC005",
+    "notices_in_scope": [
+      "email_schneider_001"
+    ],
+    "expected_current_rules": {
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 65,
+        "authoritative_source": "email_schneider_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 65,
+        "authoritative_source": "email_schneider_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_schneider_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "CSE(AI&ML)",
+          "Cybersecurity"
+        ],
+        "authoritative_source": "email_schneider_001"
+      }
+    },
+    "expected_eligibility": "INELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "multi_condition",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_067",
+    "description": "Eligible CSE(AI&ML) student.",
+    "drive_id": "DRIVE_SCHNEIDER",
+    "student_id": "1MS22CI021",
+    "notices_in_scope": [
+      "email_schneider_001"
+    ],
+    "expected_current_rules": {
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 65,
+        "authoritative_source": "email_schneider_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 65,
+        "authoritative_source": "email_schneider_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_schneider_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "CSE(AI&ML)",
+          "Cybersecurity"
+        ],
+        "authoritative_source": "email_schneider_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_068",
+    "description": "10th/12th = 60%, narrowly below the 65% requirement.",
+    "drive_id": "DRIVE_SCHNEIDER",
+    "student_id": "1MS22CS041",
+    "notices_in_scope": [
+      "email_schneider_001"
+    ],
+    "expected_current_rules": {
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 65,
+        "authoritative_source": "email_schneider_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 65,
+        "authoritative_source": "email_schneider_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_schneider_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "CSE(AI&ML)",
+          "Cybersecurity"
+        ],
+        "authoritative_source": "email_schneider_001"
+      }
+    },
+    "expected_eligibility": "INELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "multi_condition",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_069",
+    "description": "Eligible CSE(AI&ML) student (prior offer irrelevant for this drive).",
+    "drive_id": "DRIVE_SCHNEIDER",
+    "student_id": "1MS22CI039",
+    "notices_in_scope": [
+      "email_schneider_001"
+    ],
+    "expected_current_rules": {
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 65,
+        "authoritative_source": "email_schneider_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 65,
+        "authoritative_source": "email_schneider_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_schneider_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "CSE(AI&ML)",
+          "Cybersecurity"
+        ],
+        "authoritative_source": "email_schneider_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_070",
+    "description": "Eligible ETE student.",
+    "drive_id": "DRIVE_TECHMAHINDRA",
+    "student_id": "1MS22ET023",
+    "notices_in_scope": [
+      "email_tm_001"
+    ],
+    "expected_current_rules": {
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 50,
+        "authoritative_source": "email_tm_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 50,
+        "authoritative_source": "email_tm_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "CSE(AI&ML)",
+          "ECE",
+          "ETE",
+          "ISE"
+        ],
+        "authoritative_source": "email_tm_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_071",
+    "description": "MECH not in the allowed list.",
+    "drive_id": "DRIVE_TECHMAHINDRA",
+    "student_id": "1MS22ME022",
+    "notices_in_scope": [
+      "email_tm_001"
+    ],
+    "expected_current_rules": {
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 50,
+        "authoritative_source": "email_tm_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 50,
+        "authoritative_source": "email_tm_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "CSE(AI&ML)",
+          "ECE",
+          "ETE",
+          "ISE"
+        ],
+        "authoritative_source": "email_tm_001"
+      }
+    },
+    "expected_eligibility": "INELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_072",
+    "description": "EIE not in the allowed list.",
+    "drive_id": "DRIVE_TECHMAHINDRA",
+    "student_id": "1MS22EI014",
+    "notices_in_scope": [
+      "email_tm_001"
+    ],
+    "expected_current_rules": {
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 50,
+        "authoritative_source": "email_tm_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 50,
+        "authoritative_source": "email_tm_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "CSE(AI&ML)",
+          "ECE",
+          "ETE",
+          "ISE"
+        ],
+        "authoritative_source": "email_tm_001"
+      }
+    },
+    "expected_eligibility": "INELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_073",
+    "description": "Eligible CSE(AI&ML) student.",
+    "drive_id": "DRIVE_TECHMAHINDRA",
+    "student_id": "1MS22CI002",
+    "notices_in_scope": [
+      "email_tm_001"
+    ],
+    "expected_current_rules": {
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 50,
+        "authoritative_source": "email_tm_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 50,
+        "authoritative_source": "email_tm_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "CSE(AI&ML)",
+          "ECE",
+          "ETE",
+          "ISE"
+        ],
+        "authoritative_source": "email_tm_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_074",
+    "description": "Eligible EIE student via placement-cell WhatsApp notice.",
+    "drive_id": "DRIVE_IBM",
+    "student_id": "1MS22EI014",
+    "notices_in_scope": [
+      "whatsapp_ibm_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.0,
+        "authoritative_source": "whatsapp_ibm_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "whatsapp_ibm_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE",
+          "ECE",
+          "EEE",
+          "EIE",
+          "ETE"
+        ],
+        "authoritative_source": "whatsapp_ibm_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_075",
+    "description": "CGPA 7.05, comfortably eligible.",
+    "drive_id": "DRIVE_IBM",
+    "student_id": "1MS22CS029",
+    "notices_in_scope": [
+      "whatsapp_ibm_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.0,
+        "authoritative_source": "whatsapp_ibm_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "whatsapp_ibm_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE",
+          "ECE",
+          "EEE",
+          "EIE",
+          "ETE"
+        ],
+        "authoritative_source": "whatsapp_ibm_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_076",
+    "description": "MECH not in the allowed branch list.",
+    "drive_id": "DRIVE_IBM",
+    "student_id": "1MS22ME010",
+    "notices_in_scope": [
+      "whatsapp_ibm_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.0,
+        "authoritative_source": "whatsapp_ibm_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "whatsapp_ibm_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE",
+          "ECE",
+          "EEE",
+          "EIE",
+          "ETE"
+        ],
+        "authoritative_source": "whatsapp_ibm_001"
+      }
+    },
+    "expected_eligibility": "INELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_077",
+    "description": "Fails CGPA and backlogs.",
+    "drive_id": "DRIVE_IBM",
+    "student_id": "1MS22ET012",
+    "notices_in_scope": [
+      "whatsapp_ibm_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 7.0,
+        "authoritative_source": "whatsapp_ibm_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "whatsapp_ibm_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE",
+          "ECE",
+          "EEE",
+          "EIE",
+          "ETE"
+        ],
+        "authoritative_source": "whatsapp_ibm_001"
+      }
+    },
+    "expected_eligibility": "INELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_078",
+    "description": "CGPA 8.88, comfortably eligible.",
+    "drive_id": "DRIVE_GE",
+    "student_id": "1MS22CS020",
+    "notices_in_scope": [
+      "email_ge_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 8.0,
+        "authoritative_source": "email_ge_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_079",
+    "description": "CGPA 7.2 < 8.0.",
+    "drive_id": "DRIVE_GE",
+    "student_id": "1MS22CS007",
+    "notices_in_scope": [
+      "email_ge_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 8.0,
+        "authoritative_source": "email_ge_001"
+      }
+    },
+    "expected_eligibility": "INELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_080",
+    "description": "CGPA exactly 8.0, boundary passes.",
+    "drive_id": "DRIVE_GE",
+    "student_id": "1MS22IS009",
+    "notices_in_scope": [
+      "email_ge_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 8.0,
+        "authoritative_source": "email_ge_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_081",
+    "description": "CGPA null -> UNKNOWN.",
+    "drive_id": "DRIVE_GE",
+    "student_id": "1MS22CS037",
+    "notices_in_scope": [
+      "email_ge_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 8.0,
+        "authoritative_source": "email_ge_001"
+      }
+    },
+    "expected_eligibility": "UNKNOWN",
+    "expected_unknown": true,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "missing_info",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_082",
+    "description": "CGPA 7.05 < 8.0.",
+    "drive_id": "DRIVE_GE",
+    "student_id": "1MS22CS029",
+    "notices_in_scope": [
+      "email_ge_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 8.0,
+        "authoritative_source": "email_ge_001"
+      }
+    },
+    "expected_eligibility": "INELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_083",
+    "description": "Fails backlogs (3 active).",
+    "drive_id": "DRIVE_MORPHLE",
+    "student_id": "1MS22ET012",
+    "notices_in_scope": [
+      "email_morphle_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 6.0,
+        "authoritative_source": "email_morphle_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_morphle_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE",
+          "ECE",
+          "ETE",
+          "EIE",
+          "MECH"
+        ],
+        "authoritative_source": "email_morphle_001"
+      }
+    },
+    "expected_eligibility": "INELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_084",
+    "description": "Eligible MECH student.",
+    "drive_id": "DRIVE_MORPHLE",
+    "student_id": "1MS22ME010",
+    "notices_in_scope": [
+      "email_morphle_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 6.0,
+        "authoritative_source": "email_morphle_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_morphle_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE",
+          "ECE",
+          "ETE",
+          "EIE",
+          "MECH"
+        ],
+        "authoritative_source": "email_morphle_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_085",
+    "description": "Eligible CSE student.",
+    "drive_id": "DRIVE_MORPHLE",
+    "student_id": "1MS22CS029",
+    "notices_in_scope": [
+      "email_morphle_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 6.0,
+        "authoritative_source": "email_morphle_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_morphle_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE",
+          "ECE",
+          "ETE",
+          "EIE",
+          "MECH"
+        ],
+        "authoritative_source": "email_morphle_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_086",
+    "description": "Eligible EIE student.",
+    "drive_id": "DRIVE_MORPHLE",
+    "student_id": "1MS22EI030",
+    "notices_in_scope": [
+      "email_morphle_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 6.0,
+        "authoritative_source": "email_morphle_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_morphle_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE",
+          "ECE",
+          "ETE",
+          "EIE",
+          "MECH"
+        ],
+        "authoritative_source": "email_morphle_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_087",
+    "description": "Branch is null -> UNKNOWN.",
+    "drive_id": "DRIVE_MORPHLE",
+    "student_id": "1MS22CS031",
+    "notices_in_scope": [
+      "email_morphle_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 6.0,
+        "authoritative_source": "email_morphle_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_morphle_001"
+      },
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE",
+          "ECE",
+          "ETE",
+          "EIE",
+          "MECH"
+        ],
+        "authoritative_source": "email_morphle_001"
+      }
+    },
+    "expected_eligibility": "UNKNOWN",
+    "expected_unknown": true,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "missing_info",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_088",
+    "description": "Notice states no extractable numeric/branch criteria -- vacuously eligible.",
+    "drive_id": "DRIVE_APTOS",
+    "student_id": "1MS22CS001",
+    "notices_in_scope": [
+      "email_aptos_001"
+    ],
+    "expected_current_rules": {},
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_089",
+    "description": "Eligible despite poor stats -- correct per spec since no criteria were ever stated.",
+    "drive_id": "DRIVE_APTOS",
+    "student_id": "1MS22ME040",
+    "notices_in_scope": [
+      "email_aptos_001"
+    ],
+    "expected_current_rules": {},
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_090",
+    "description": "Fails 10th/12th% and backlogs.",
+    "drive_id": "DRIVE_ERICSSON",
+    "student_id": "1MS22ET012",
+    "notices_in_scope": [
+      "email_ericsson_001"
+    ],
+    "expected_current_rules": {
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 60,
+        "authoritative_source": "email_ericsson_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 60,
+        "authoritative_source": "email_ericsson_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_ericsson_001"
+      }
+    },
+    "expected_eligibility": "INELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_091",
+    "description": "Eligible, no branch restriction for this drive.",
+    "drive_id": "DRIVE_ERICSSON",
+    "student_id": "1MS22CS029",
+    "notices_in_scope": [
+      "email_ericsson_001"
+    ],
+    "expected_current_rules": {
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 60,
+        "authoritative_source": "email_ericsson_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 60,
+        "authoritative_source": "email_ericsson_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_ericsson_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_092",
+    "description": "Eligible Cybersecurity student.",
+    "drive_id": "DRIVE_ERICSSON",
+    "student_id": "1MS22CY028",
+    "notices_in_scope": [
+      "email_ericsson_001"
+    ],
+    "expected_current_rules": {
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 60,
+        "authoritative_source": "email_ericsson_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 60,
+        "authoritative_source": "email_ericsson_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_ericsson_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_093",
+    "description": "10th% null -> UNKNOWN.",
+    "drive_id": "DRIVE_ERICSSON",
+    "student_id": "1MS22CS033",
+    "notices_in_scope": [
+      "email_ericsson_001"
+    ],
+    "expected_current_rules": {
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 60,
+        "authoritative_source": "email_ericsson_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 60,
+        "authoritative_source": "email_ericsson_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_ericsson_001"
+      }
+    },
+    "expected_eligibility": "UNKNOWN",
+    "expected_unknown": true,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "missing_info",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_094",
+    "description": "Eligible EIE student.",
+    "drive_id": "DRIVE_ERICSSON",
+    "student_id": "1MS22EI014",
+    "notices_in_scope": [
+      "email_ericsson_001"
+    ],
+    "expected_current_rules": {
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 60,
+        "authoritative_source": "email_ericsson_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 60,
+        "authoritative_source": "email_ericsson_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_ericsson_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_095",
+    "description": "Eligible CSE student.",
+    "drive_id": "DRIVE_OPUS",
+    "student_id": "1MS22CS024",
+    "notices_in_scope": [
+      "email_opus_001"
+    ],
+    "expected_current_rules": {
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "CSE(AI&ML)",
+          "ISE"
+        ],
+        "authoritative_source": "email_opus_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_096",
+    "description": "MECH not in the allowed list.",
+    "drive_id": "DRIVE_OPUS",
+    "student_id": "1MS22ME022",
+    "notices_in_scope": [
+      "email_opus_001"
+    ],
+    "expected_current_rules": {
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "CSE(AI&ML)",
+          "ISE"
+        ],
+        "authoritative_source": "email_opus_001"
+      }
+    },
+    "expected_eligibility": "INELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_097",
+    "description": "Eligible CSE(AI&ML) student.",
+    "drive_id": "DRIVE_OPUS",
+    "student_id": "1MS22CI027",
+    "notices_in_scope": [
+      "email_opus_001"
+    ],
+    "expected_current_rules": {
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "CSE(AI&ML)",
+          "ISE"
+        ],
+        "authoritative_source": "email_opus_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_098",
+    "description": "ECE not in the allowed list.",
+    "drive_id": "DRIVE_OPUS",
+    "student_id": "1MS22EC005",
+    "notices_in_scope": [
+      "email_opus_001"
+    ],
+    "expected_current_rules": {
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "CSE(AI&ML)",
+          "ISE"
+        ],
+        "authoritative_source": "email_opus_001"
+      }
+    },
+    "expected_eligibility": "INELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_099",
+    "description": "Eligible CSE(AI&ML) student (second KPMG case).",
+    "drive_id": "DRIVE_KPMG",
+    "student_id": "1MS22CI021",
+    "notices_in_scope": [
+      "email_kpmg_001"
+    ],
+    "expected_current_rules": {
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "CSE(AI&ML)",
+          "Cybersecurity"
+        ],
+        "authoritative_source": "email_kpmg_001"
+      },
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 60,
+        "authoritative_source": "email_kpmg_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 60,
+        "authoritative_source": "email_kpmg_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_kpmg_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
+  },
+  {
+    "case_id": "CASE_100",
+    "description": "Eligible, open to all branches (second AeroVane case).",
+    "drive_id": "DRIVE_AEROVANE",
+    "student_id": "1MS22IS025",
+    "notices_in_scope": [
+      "email_aerovane_001"
+    ],
+    "expected_current_rules": {
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 6.5,
+        "authoritative_source": "email_aerovane_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "email_aerovane_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": ""
   }
 ]

@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """Baseline A — LLM-only eligibility evaluation.
 
-Sends the raw placement notice text + student profile directly to the LLM and
-asks it to decide ELIGIBLE / INELIGIBLE / UNKNOWN without any deterministic rule
-engine. Implements Baseline A from PlaceGuard_Evaluation_Plan.md §4.
+Sends the raw notice/WhatsApp/portal text (all channels in `notices_in_scope`)
+plus the student profile directly to the LLM and asks it to decide
+ELIGIBLE / INELIGIBLE / UNKNOWN without any retrieval, reconciliation, or
+deterministic rule engine. Implements Baseline A from
+PlaceGuard_Evaluation_Plan.md §4.
 
 Usage (from project root):
     python eval/baseline_llm_only.py
@@ -14,23 +16,28 @@ Requires a valid LLM API key in .env (GEMINI_API_KEY / OPENAI_API_KEY / CLAUDE_A
 from __future__ import annotations
 
 import json
+import sys
 import time
 from pathlib import Path
 
 from extraction.llm_client import get_llm_client
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
 DATA_DIR = Path(__file__).parent.parent / "data"
 GOLD_SET_FILE = DATA_DIR / "gold_set.json"
-STUDENTS_FILE = DATA_DIR / "synthetic_students.json"
-NOTICES_FILE = DATA_DIR / "synthetic_notices.json"
+STUDENTS_FILE = DATA_DIR / "students.json"
 
 SYSTEM_PROMPT = """You are an eligibility decision engine for college placement drives.
 
 You will be given:
 1. A student's profile (CGPA, branch, backlogs, prior offer, 10th%, 12th%)
-2. One or more placement notices about the drive
+2. One or more raw messages about the drive (emails, WhatsApp messages, or portal records,
+   in no particular order, possibly conflicting or outdated)
 
-Your task: decide whether this student is eligible for the drive.
+Your task: decide whether this student is eligible for the drive, using your own judgement
+about which message is current and authoritative.
 
 Reply with ONLY one of these three words (no explanation):
 ELIGIBLE
@@ -41,30 +48,27 @@ Use UNKNOWN only when you genuinely cannot determine eligibility from the inform
 """
 
 
-def build_prompt(student: dict, notices: list[dict]) -> str:
+def build_prompt(student: dict, items: list[dict]) -> str:
     notice_texts = "\n\n---\n\n".join(
-        f"[{n['source_type'].upper()} | {n['timestamp']}]\n{n['text']}"
-        for n in notices
+        f"[{item['source_type'].upper()} | {item['timestamp']} | id={source_id}]\n{item['text']}"
+        for source_id, item in items
     )
     return f"""STUDENT PROFILE:
 {json.dumps(student, indent=2)}
 
-PLACEMENT NOTICES:
+MESSAGES ABOUT THIS DRIVE:
 {notice_texts}
 
 Based on the above, is this student ELIGIBLE, INELIGIBLE, or UNKNOWN?"""
 
 
 def run_baseline() -> None:
+    from eval.run_eval import _load_source_index  # local import avoids a cycle at module load
+
     students_raw = json.loads(STUDENTS_FILE.read_text(encoding="utf-8"))
-    students = {s["student_id"]: s for s in students_raw}
+    students = {s["usn"]: s for s in students_raw}
 
-    notices_raw = json.loads(NOTICES_FILE.read_text(encoding="utf-8"))
-    # Group notices by drive_id
-    notices_by_drive: dict[str, list[dict]] = {}
-    for n in notices_raw:
-        notices_by_drive.setdefault(n["drive_id"], []).append(n)
-
+    source_index = _load_source_index()
     gold_cases = json.loads(GOLD_SET_FILE.read_text(encoding="utf-8"))
 
     try:
@@ -77,28 +81,24 @@ def run_baseline() -> None:
     total = correct = 0
     results = []
 
-    print(f"{'Case':<12} {'Expected':<12} {'Predicted':<12} {'Latency':>9}  {'Pass'}")
+    print(f"{'Case':<10} {'Expected':<12} {'Predicted':<12} {'Latency':>9}  {'Pass'}")
     print("-" * 55)
 
     for case in gold_cases:
         case_id = case["case_id"]
         student_id = case["student_id"]
-        drive_id = case["drive_id"]
         expected = case["expected_eligibility"]
-        in_scope = set(case.get("notices_in_scope", []))
+        in_scope = case.get("notices_in_scope", [])
 
         student = students.get(student_id)
         if student is None:
-            print(f"{case_id:<12} {'?':<12} {'ERROR':<12} {'':>9}  ✗  (student not found)")
+            print(f"{case_id:<10} {'?':<12} {'ERROR':<12} {'':>9}  x  (student not found)")
             total += 1
             continue
 
-        notices = [
-            n for n in notices_by_drive.get(drive_id, [])
-            if n["notice_id"] in in_scope
-        ]
+        items = [(sid, source_index[sid]) for sid in in_scope if sid in source_index]
 
-        prompt = build_prompt(student, notices)
+        prompt = build_prompt(student, items)
         full_prompt = f"{SYSTEM_PROMPT}\n\n{prompt}"
 
         try:
@@ -106,7 +106,6 @@ def run_baseline() -> None:
             response = llm.generate(full_prompt, temperature=0.0)
             latency_ms = (time.perf_counter() - t0) * 1000
 
-            # Extract the verdict — first word that matches one of the three states
             predicted = "UNKNOWN"
             for token in response.strip().split():
                 token_upper = token.strip(".,!?").upper()
@@ -114,15 +113,15 @@ def run_baseline() -> None:
                     predicted = token_upper
                     break
         except Exception as exc:
-            print(f"{case_id:<12} {expected:<12} {'ERROR':<12} {'':>9}  ✗  ({exc})")
+            print(f"{case_id:<10} {expected:<12} {'ERROR':<12} {'':>9}  x  ({exc})")
             total += 1
             results.append({"case_id": case_id, "expected": expected, "predicted": "ERROR", "error": str(exc)})
             continue
 
         correct_flag = predicted == expected
-        tick = "✓" if correct_flag else "✗"
+        tick = "v" if correct_flag else "x"
         lat = f"{latency_ms:.0f} ms"
-        print(f"{case_id:<12} {expected:<12} {predicted:<12} {lat:>9}  {tick}")
+        print(f"{case_id:<10} {expected:<12} {predicted:<12} {lat:>9}  {tick}")
 
         total += 1
         if correct_flag:
@@ -138,7 +137,6 @@ def run_baseline() -> None:
     accuracy = correct / total if total else 0.0
     print(f"\nBaseline A (LLM-only) accuracy: {correct}/{total} = {accuracy:.1%}")
 
-    # Save results for comparison
     out_file = Path(__file__).parent / "baseline_llm_only_results.json"
     out_file.write_text(json.dumps(results, indent=2), encoding="utf-8")
     print(f"Results saved to {out_file}")

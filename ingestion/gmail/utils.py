@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import base64
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 from email.mime.text import MIMEText
 from typing import Any
 
@@ -197,11 +197,15 @@ def parse_gmail_date(date_str: str) -> datetime:
     from email.utils import parsedate_to_datetime
     
     try:
-        # Parse RFC 2822 date
+        # Parse RFC 2822 date (e.g. "+0530") and actually convert to UTC
+        # before dropping tzinfo - stripping it directly would keep the
+        # local wall-clock time, silently mislabeling it as UTC.
         dt = parsedate_to_datetime(date_str)
-        # Convert to naive UTC for consistency with database
-        return dt.replace(tzinfo=None)
-    
+        if dt.tzinfo is None:
+            # No offset in the header (rare) - already effectively naive.
+            return dt
+        return dt.astimezone(timezone.utc).replace(tzinfo=None)
+
     except Exception:
         # Fallback to current time if parsing fails
         return datetime.utcnow()

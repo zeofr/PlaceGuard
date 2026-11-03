@@ -328,5 +328,137 @@
     "has_prior_offer": false,
     "tenth_pct": 86.0,
     "twelfth_pct": 83.0
+  },
+  {
+    "usn": "1MS22CS031",
+    "name": "Yash Khurana",
+    "date_of_birth": "2003-02-09",
+    "cgpa": 8.2,
+    "branch": null,
+    "backlogs": 0,
+    "has_prior_offer": false,
+    "tenth_pct": 81.0,
+    "twelfth_pct": 78.0
+  },
+  {
+    "usn": "1MS22IS032",
+    "name": "Simran Kaur",
+    "date_of_birth": "2003-06-30",
+    "cgpa": 7.6,
+    "branch": "ISE",
+    "backlogs": 0,
+    "has_prior_offer": null,
+    "tenth_pct": 76.0,
+    "twelfth_pct": 73.0
+  },
+  {
+    "usn": "1MS22CS033",
+    "name": "Harsh Vardhan",
+    "date_of_birth": "2003-08-17",
+    "cgpa": 8.1,
+    "branch": "CSE",
+    "backlogs": 0,
+    "has_prior_offer": false,
+    "tenth_pct": null,
+    "twelfth_pct": 79.0
+  },
+  {
+    "usn": "1MS22EC034",
+    "name": "Tara Chawla",
+    "date_of_birth": "2003-04-02",
+    "cgpa": 7.4,
+    "branch": "ECE",
+    "backlogs": 0,
+    "has_prior_offer": false,
+    "tenth_pct": 74.0,
+    "twelfth_pct": null
+  },
+  {
+    "usn": "1MS22CS035",
+    "name": "Rudra Prasad",
+    "date_of_birth": "2003-01-21",
+    "cgpa": 7.0,
+    "branch": "CSE",
+    "backlogs": 0,
+    "has_prior_offer": false,
+    "tenth_pct": 70.0,
+    "twelfth_pct": 70.0
+  },
+  {
+    "usn": "1MS22IS036",
+    "name": "Neha Sinha",
+    "date_of_birth": "2003-09-26",
+    "cgpa": 7.8,
+    "branch": "ISE",
+    "backlogs": 2,
+    "has_prior_offer": false,
+    "tenth_pct": 78.0,
+    "twelfth_pct": 76.0
+  },
+  {
+    "usn": "1MS22CS037",
+    "name": "Aarush Bedi",
+    "date_of_birth": "2003-05-14",
+    "cgpa": null,
+    "branch": "CSE",
+    "backlogs": null,
+    "has_prior_offer": false,
+    "tenth_pct": 80.0,
+    "twelfth_pct": 77.0
+  },
+  {
+    "usn": "1MS22CS038",
+    "name": "Diya Kulkarni",
+    "date_of_birth": "2003-12-03",
+    "cgpa": 9.4,
+    "branch": "CSE",
+    "backlogs": 0,
+    "has_prior_offer": false,
+    "tenth_pct": 95.0,
+    "twelfth_pct": 92.0
+  },
+  {
+    "usn": "1MS22CI039",
+    "name": "Veer Malhotra",
+    "date_of_birth": "2003-03-08",
+    "cgpa": 8.3,
+    "branch": "CSE(AI&ML)",
+    "backlogs": 0,
+    "has_prior_offer": true,
+    "tenth_pct": 83.0,
+    "twelfth_pct": 80.0
+  },
+  {
+    "usn": "1MS22ME040",
+    "name": "Ira Chandra",
+    "date_of_birth": "2003-07-19",
+    "cgpa": 5.8,
+    "branch": "MECH",
+    "backlogs": 4,
+    "has_prior_offer": false,
+    "tenth_pct": 58.0,
+    "twelfth_pct": 55.0
+  },
+  {
+    "usn": "1MS22CS041",
+    "name": "Omkar Bhosale",
+    "date_of_birth": "2003-10-11",
+    "cgpa": 7.65,
+    "branch": "CSE",
+    "backlogs": 0,
+    "has_prior_offer": false,
+    "tenth_pct": 60.0,
+    "twelfth_pct": 60.0
+  },
+  {
+    "usn": "1MS22EC042",
+    "name": "Mihika Rane",
+    "date_of_birth": "2003-02-23",
+    "cgpa": 8.6,
+    "branch": "ECE",
+    "backlogs": 0,
+    "has_prior_offer": false,
+    "tenth_pct": 85.0,
+    "twelfth_pct": 82.0
   }
 ]

@@ -135,6 +135,29 @@ BRANCH EXTRACTION RULES - CRITICAL:
    - "ECE, ETE, EIE" → "ECE,ETE,EIE"
    - "All branches" → "ALL"
 
+ALLOWED_BRANCHES LIST_OPERATION - CRITICAL (allowed_branches criterion ONLY):
+Every allowed_branches criterion MUST include a "list_operation" field: "add", "remove", or "replace".
+- Use "add" when the notice is EXTENDING eligibility to additional branch(es) on top of whatever
+  is already eligible — phrasing like "can also apply", "is/are now also eligible", "added to the
+  allowed branches", "X branch has been included". Extract ONLY the newly-added branch(es) as the
+  value, with operator "in" — do NOT guess or repeat branches from earlier notices you haven't seen.
+- Use "remove" when the notice REVOKES eligibility for specific branch(es) that were previously
+  eligible, without stating what the new complete list is — phrasing like "X cannot apply", "X is/are
+  no longer eligible", "X branch has been removed/excluded". Extract ONLY the branch(es) being removed
+  as the value, with operator "in" (NOT "not_in" — leave turning this into an exclusion rule to the
+  system; your job is just to say which branch(es) lost eligibility in THIS notice).
+- Use "replace" (the default) when the notice states the complete, final set of eligible branches
+  (or explicitly uses "only"/"restricted to" to give the full final set), or there is no reference to
+  a prior state at all. For "replace", choose operator "in" for an inclusive list or "not_in" for an
+  explicit exclusion list, as before.
+Examples:
+   - "ECE branch can also apply to Schneider Electric" → {"criterion_type": "allowed_branches", "operator": "in", "value": "ECE", "list_operation": "add", ...}
+   - "MECH students are now also eligible" → {"criterion_type": "allowed_branches", "operator": "in", "value": "MECH", "list_operation": "add", ...}
+   - "CSE branch cannot apply to Schneider Electric" → {"criterion_type": "allowed_branches", "operator": "in", "value": "CSE", "list_operation": "remove", ...}
+   - "ECE students are no longer eligible" → {"criterion_type": "allowed_branches", "operator": "in", "value": "ECE", "list_operation": "remove", ...}
+   - "Only CSE and ISE are eligible for this drive" → {"criterion_type": "allowed_branches", "operator": "in", "value": "CSE,ISE", "list_operation": "replace", ...}
+   - "CS Allied branches" (first-time criterion for a drive) → {"criterion_type": "allowed_branches", "operator": "in", "value": "CSE,ISE,CSE(AI&ML),Cybersecurity", "list_operation": "replace", ...}
+
 DEADLINE EXTRACTION RULES - CRITICAL:
 1. ALWAYS extract deadline in ISO 8601 format: YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS
 2. Convert relative dates to absolute dates (use context to infer year if needed)
@@ -170,12 +193,16 @@ Output format: JSON array of criterion objects with this structure:
   "supersedes_ref": null,
   "notes": ""
 }
+For "criterion_type": "allowed_branches" ONLY, also include "list_operation": "add", "remove", or
+"replace" per the ALLOWED_BRANCHES LIST_OPERATION rules above.
 
 EXAMPLE outputs:
 - For "70% in 12th": {"criterion_type": "min_12th_pct", "operator": "gte", "value": "70", ...}
 - For "60% in 10th": {"criterion_type": "min_10th_pct", "operator": "gte", "value": "60", ...}
-- For "CSE and ISE only": {"criterion_type": "allowed_branches", "operator": "in", "value": "CSE,ISE", ...}
-- For "CS Allied branches": {"criterion_type": "allowed_branches", "operator": "in", "value": "CSE,ISE,CSE(AI&ML),Cybersecurity", ...}
+- For "CSE and ISE only": {"criterion_type": "allowed_branches", "operator": "in", "value": "CSE,ISE", "list_operation": "replace", ...}
+- For "CS Allied branches": {"criterion_type": "allowed_branches", "operator": "in", "value": "CSE,ISE,CSE(AI&ML),Cybersecurity", "list_operation": "replace", ...}
+- For "ECE branch can also apply": {"criterion_type": "allowed_branches", "operator": "in", "value": "ECE", "list_operation": "add", ...}
+- For "CSE branch cannot apply": {"criterion_type": "allowed_branches", "operator": "in", "value": "CSE", "list_operation": "remove", ...}
 - For "Deadline: Nov 5th 6PM": {"criterion_type": "deadline", "operator": "lte", "value": "2024-11-05T18:00:00", ...}
 """
 
@@ -478,6 +505,8 @@ def extract_criteria_from_notice(
         # requiring a schema change to the immutable facts table.
         fact.extraction_confidence = item.get("confidence", "high")
         fact.extraction_notes = item.get("notes", "")
+        if criterion_type == "allowed_branches":
+            fact.branch_list_operation = item.get("list_operation", "replace")
 
         facts.append(fact)
     

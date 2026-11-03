@@ -16,6 +16,7 @@ from pathlib import Path
 from core.schemas import Student as StudentSchema
 from database import crud, init_db
 from database.connection import get_db_context
+from database.vector_indexing import reindex_all_facts
 
 # Import the manual criteria loader
 import sys
@@ -89,6 +90,11 @@ def main() -> None:
         print(f"  ✓ Inserted {s} student(s)")
         print(f"  ✓ Inserted {d} drive(s)")
         print(f"  ✓ Inserted {c} eligibility criteria")
+        print()
+
+        print("Indexing seeded facts into the vector store...")
+        indexed = reindex_all_facts(db)
+        print(f"  ✓ Indexed {indexed} notice(s) into the vector store")
         print()
 
     print("=" * 70)

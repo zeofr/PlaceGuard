@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
 """Manually load pre-extracted criteria for realistic drives.
 
-This script inserts criteria directly into extracted_criteria table
-for testing without requiring LLM extraction.
+This script stands in for a real source (the SIS portal integration isn't
+available yet) exactly like ingestion/portal/adapter.py does for the portal
+channel: it inserts real, auditable Facts and runs them through the same
+reconciliation used by WhatsApp/email/portal ingestion, rather than writing
+ExtractedCriterion directly. That keeps this seed data indistinguishable
+from real data to the rest of the pipeline (vector indexing included), so
+swapping this stand-in for the real portal later requires no pipeline change.
 
 Usage (from project root):
     python data/load_manual_criteria.py
@@ -16,6 +21,7 @@ from pathlib import Path
 
 from database import crud, init_db
 from database.connection import get_db_context
+from reconciliation.temporal_provenance_engine import reconcile_facts_for_drive
 
 # Pre-extracted criteria for each realistic drive
 # Based on the actual notice text in notices.json
@@ -75,37 +81,59 @@ DRIVE_CRITERIA = {
 
 
 def load_manual_criteria(db) -> int:
-    """Insert pre-extracted criteria for each drive."""
+    """Insert pre-extracted criteria for each drive as real Facts, then reconcile.
+
+    Each criterion becomes its own append-only Fact (unique source_id, so it's
+    individually indexable into the vector store — a shared source_id across a
+    drive's criteria would mean only one gets embedded). ExtractedCriterion is
+    then derived by the same reconciliation real ingestion uses, never written
+    directly.
+    """
     inserted = 0
     timestamp = datetime(2026, 10, 29, 12, 0, 0)
-    
+    drives_seeded: list[str] = []
+
     for drive_id, criteria_list in DRIVE_CRITERIA.items():
         # Check if drive exists
         drive = crud.get_drive(db, drive_id)
         if not drive:
             print(f"   ⚠ Drive {drive_id} not found, skipping")
             continue
-        
+
         for criterion_data in criteria_list:
+            source_id = f"manual_{drive_id}_{criterion_data['criterion_type']}"
+
+            # Facts are append-only; skip if this seed fact already exists
+            # (keeps re-running this script safe, same as real ingestion does).
+            if crud.get_fact_by_source(db, source_id):
+                continue
+
             # JSON-encode the value for storage (single encoding)
             # The value will be stored as JSON string in database
             # and parsed back when loaded
             value_json = json.dumps(criterion_data["value"])
-            
-            crud.upsert_extracted_criterion(
+
+            crud.insert_fact(
                 db,
+                source_id=source_id,
+                source_type="placement_cell_email",
+                authority_rank=2,
+                timestamp=timestamp,
                 drive_id=drive_id,
                 criterion_type=criterion_data["criterion_type"],
                 operator=criterion_data["operator"],
                 value=value_json,  # This is now: "50.0" not '"50.0"'
-                source_id=f"manual_{drive_id}",
-                source_type="placement_cell_email",
-                authority_rank=2,
-                timestamp=timestamp,
                 scope=criterion_data.get("scope", "ALL"),
             )
             inserted += 1
-    
+
+        if criteria_list:
+            drives_seeded.append(drive_id)
+
+    # Derive ExtractedCriterion the same way real ingestion does.
+    for drive_id in drives_seeded:
+        reconcile_facts_for_drive(db, drive_id, persist=True)
+
     return inserted
 
 
@@ -119,12 +147,17 @@ def main() -> None:
     print()
     
     init_db()
-    
+
     with get_db_context() as db:
         c = load_manual_criteria(db)
         print(f"  ✓ Inserted {c} criteria across {len(DRIVE_CRITERIA)} drives")
         print()
-    
+
+        from database.vector_indexing import reindex_all_facts
+        print("Indexing into the vector store...")
+        reindex_all_facts(db)
+        print()
+
     print("=" * 70)
     print("✅ MANUAL CRITERIA LOADED SUCCESSFULLY")
     print("=" * 70)

@@ -1,27 +1,113 @@
 """Ingestion routes for notice processing."""
 
+import json
 from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
+from config import settings
 from core.schemas import SourceType
 from database.connection import get_db
 from database.crud import (
     create_drive,
     create_processed_email,
+    get_criterion_by_type,
     get_drive,
     get_fact_by_source,
     is_email_processed,
 )
+from database.vector_indexing import index_fact_to_vector_store
 from extraction.llm_client import get_llm_client
-from extraction.notice_extractor import extract_criteria_from_notice
+from extraction.notice_extractor import extract_with_confidence
 from ingestion.gmail.adapter import GmailAdapter, GmailAdapterError
 from ingestion.gmail.auth import GmailAuthenticationError
 from ingestion.gmail.classifier import EmailClassification, EmailClassifier
 from ingestion.portal.adapter import PortalAdapter
-from reconciliation.temporal_provenance_engine import reconcile_facts_for_drive
+from reconciliation.rag_reconciliation import reconcile_facts_for_drive_rag
+
+
+def _index_facts_best_effort(facts: list) -> None:
+    """Index newly stored facts into the vector store.
+
+    Retrieval-only side effect: indexing failures are logged and swallowed
+    so they never fail ingestion of the underlying facts.
+    """
+    if not settings.vector_store_enabled:
+        return
+    try:
+        for fact in facts:
+            index_fact_to_vector_store(fact)
+    except Exception as e:
+        print(f"Warning: Vector indexing failed: {e}")
+
+
+def _merge_branch_delta_facts(db: Session, facts: list) -> None:
+    """Apply an "add"/"remove"-flagged allowed_branches fact as a delta, not a replacement.
+
+    extract_criteria_from_notice() only ever sees the notice text in isolation, so a
+    delta notice ("ECE can also apply", "CSE cannot apply") extracts just the
+    affected branch(es) — reconciliation would otherwise let that single-branch
+    fact replace the drive's whole criterion, since it picks one winning fact per
+    rule key rather than merging. This runs before facts are stored, computing the
+    delta against the drive's CURRENT criterion so reconciliation's existing
+    winner-take-all logic can stay unchanged.
+
+    The result must stay representationally consistent with how the current
+    criterion is expressed:
+    - current operator "in" (a whitelist): "add" appends to it, "remove" removes
+      from it — it's still a whitelist, just a different one.
+    - current operator "not_in" (a blacklist): "add" (branch becomes eligible)
+      removes it from the blacklist; "remove" (branch becomes ineligible) appends
+      to the blacklist — it's still a blacklist.
+    The fact's own extracted operator is only used when there's no current
+    criterion to delta against (a fresh drive), matching prior behavior.
+    """
+    for fact in facts:
+        if fact.criterion_type != "allowed_branches":
+            continue
+        op = getattr(fact, "branch_list_operation", "replace")
+        if op not in ("add", "remove"):
+            continue  # "replace" (or unset): use the extracted fact as-is
+
+        current = get_criterion_by_type(db, fact.drive_id, "allowed_branches", fact.scope)
+        if not current:
+            continue  # no baseline to delta against; the new value stands as-is
+
+        try:
+            current_value = json.loads(current.value)
+            delta_value = json.loads(fact.value)
+        except (json.JSONDecodeError, TypeError):
+            continue
+
+        delta_list = delta_value if isinstance(delta_value, list) else [delta_value]
+
+        if current_value == "ALL":
+            # Open to all today: "add" is a no-op, "remove" becomes an exclusion.
+            if op == "remove":
+                fact.operator = "not_in"
+                fact.value = json.dumps(delta_list)
+            else:
+                fact.value = current.value
+            continue
+
+        current_list = current_value if isinstance(current_value, list) else [current_value]
+        is_blacklist = current.operator == "not_in"
+        # "add" (newly eligible) removes from a blacklist, appends to a whitelist.
+        # "remove" (newly ineligible) does the opposite.
+        appending = (op == "add" and not is_blacklist) or (op == "remove" and is_blacklist)
+
+        if appending:
+            merged = list(current_list)
+            for branch in delta_list:
+                if branch not in merged:
+                    merged.append(branch)
+        else:
+            merged = [b for b in current_list if b not in delta_list]
+
+        fact.operator = current.operator
+        fact.value = json.dumps(merged)
 
 router = APIRouter(prefix="/ingest", tags=["ingestion"])
 
@@ -53,16 +139,17 @@ class IngestNoticeRequest(BaseModel):
 
 class IngestNoticeResponse(BaseModel):
     """Response from notice ingestion."""
-    
+
     success: bool
     drive_id: str
     facts_extracted: int
     criteria_reconciled: int
+    low_confidence_items: list[dict] = []
     message: str
 
 
 @router.post("/notice", response_model=IngestNoticeResponse)
-async def ingest_notice(
+def ingest_notice(
     request: IngestNoticeRequest,
     db: Session = Depends(get_db),
 ):
@@ -95,31 +182,40 @@ async def ingest_notice(
         # Use current time if not provided
         timestamp = request.timestamp or datetime.now(UTC).replace(tzinfo=None)
         
-        # Extract criteria from notice
+        # Extract criteria from notice, holding back low-confidence facts
+        # instead of silently applying them (a fabricated/hallucinated
+        # criterion is worse than a missing one for an eligibility decision).
         llm_client = get_llm_client()
-        facts = extract_criteria_from_notice(
+        facts, low_confidence_items = extract_with_confidence(
             notice_text=request.notice_text,
             source_id=request.source_id,
             source_type=request.source_type,
             timestamp=timestamp,
             drive_id=request.drive_id,
+            min_confidence=settings.extraction_min_confidence,
             llm_client=llm_client,
         )
-        
+        _merge_branch_delta_facts(db, facts)
+
         # Store facts in database
         for fact in facts:
             db.add(fact)
         db.commit()
-        
+        _index_facts_best_effort(facts)
+
         # Run reconciliation to update current criteria
-        reconciled = reconcile_facts_for_drive(db, request.drive_id, persist=True)
-        
+        reconciled = reconcile_facts_for_drive_rag(
+            db, request.drive_id, persist=True, use_rag=settings.vector_store_enabled
+        )
+
         return IngestNoticeResponse(
             success=True,
             drive_id=request.drive_id,
             facts_extracted=len(facts),
             criteria_reconciled=len(reconciled),
-            message=f"Successfully ingested notice and extracted {len(facts)} facts, reconciled to {len(reconciled)} current criteria",
+            low_confidence_items=low_confidence_items,
+            message=f"Successfully ingested notice and extracted {len(facts)} facts, reconciled to {len(reconciled)} current criteria"
+            + (f" ({len(low_confidence_items)} low-confidence item(s) held for review)" if low_confidence_items else ""),
         )
     
     except Exception as e:
@@ -130,7 +226,7 @@ async def ingest_notice(
 
 
 @router.post("/process-whatsapp", response_model=ProcessWhatsAppResponse)
-async def process_whatsapp_messages(
+def process_whatsapp_messages(
     whatsapp_url: str = "http://localhost:8001",
     db: Session = Depends(get_db),
 ):
@@ -217,34 +313,47 @@ async def process_whatsapp_messages(
                         company_name=company_name,
                     )
                 
-                # Extract criteria from message
-                facts = extract_criteria_from_notice(
+                # Extract criteria from message, holding back low-confidence
+                # facts instead of silently applying them.
+                facts, low_confidence_items = extract_with_confidence(
                     notice_text=msg.body,
                     source_id=msg.message_id,
                     source_type=msg.source_type,
                     timestamp=msg.timestamp.replace(tzinfo=None),
                     drive_id=drive_id,
+                    min_confidence=settings.extraction_min_confidence,
                     llm_client=llm_client,
                 )
-                
+                _merge_branch_delta_facts(db, facts)
+
                 # Store facts
                 for fact in facts:
                     db.add(fact)
                 db.commit()
-                
+                _index_facts_best_effort(facts)
+
                 total_facts += len(facts)
                 drives_affected.add(drive_id)
-                
+
+                # Reconcile this drive immediately, not batched at the end of
+                # the loop - if later messages in this batch fail or the
+                # request gets interrupted, this message's facts are still
+                # reflected in ExtractedCriterion rather than stranded.
+                reconcile_facts_for_drive_rag(
+                    db, drive_id, persist=True, use_rag=settings.vector_store_enabled
+                )
+
                 processing_details.append({
                     "message_id": msg.message_id,
                     "drive_id": drive_id,
                     "company_name": company_name,
                     "source_type": msg.source_type.value,
                     "facts_extracted": len(facts),
+                    "low_confidence_items": low_confidence_items,
                     "status": "success",
                     "body_preview": msg.body[:100] + "..." if len(msg.body) > 100 else msg.body,
                 })
-                
+
             except Exception as e:
                 processing_details.append({
                     "message_id": msg.message_id,
@@ -252,11 +361,7 @@ async def process_whatsapp_messages(
                     "status": "error",
                     "error": str(e),
                 })
-        
-        # Run reconciliation for all affected drives
-        for drive_id in drives_affected:
-            reconcile_facts_for_drive(db, drive_id, persist=True)
-        
+
         return ProcessWhatsAppResponse(
             success=True,
             messages_processed=len(messages),
@@ -354,7 +459,7 @@ class SyncGmailResponse(BaseModel):
 
 
 @router.post("/sync-gmail", response_model=SyncGmailResponse)
-async def sync_gmail(
+def sync_gmail(
     only_unread: bool = True,
     db: Session = Depends(get_db),
 ):
@@ -512,30 +617,44 @@ async def sync_gmail(
                         company_name=company_name,
                     )
                 
-                # Extract criteria
-                facts = extract_criteria_from_notice(
+                # Extract criteria, holding back low-confidence facts instead
+                # of silently applying them.
+                facts, low_confidence_items = extract_with_confidence(
                     notice_text=msg.body,
                     source_id=msg.message_id,
                     source_type=msg.source_type,
                     timestamp=msg.timestamp.replace(tzinfo=None),
                     drive_id=drive_id,
+                    min_confidence=settings.extraction_min_confidence,
                     llm_client=llm_client,
                 )
-                
+                _merge_branch_delta_facts(db, facts)
+
                 # Store facts
                 for fact in facts:
                     db.add(fact)
                 db.commit()
-                
+                _index_facts_best_effort(facts)
+
                 total_facts += len(facts)
                 drives_affected.add(drive_id)
-                
+
+                # Reconcile this drive immediately, not batched at the end of
+                # the loop - if a later email in this batch fails, times out,
+                # or the request gets interrupted, this email's facts are
+                # still reflected in ExtractedCriterion rather than stranded.
+                try:
+                    reconcile_facts_for_drive_rag(
+                        db, drive_id, persist=True, use_rag=settings.vector_store_enabled
+                    )
+                except Exception as e:
+                    errors.append(f"Reconciliation failed for {drive_id}: {str(e)}")
+
                 # Add Gmail label
                 labeled = False
                 gmail_id = gmail_adapter.extract_gmail_id_from_message_id(msg.message_id)
                 if gmail_id:
                     try:
-                        from config import settings
                         gmail_adapter.add_label(gmail_id, settings.gmail_processed_label)
                         labeled = True
                     except Exception as e:
@@ -564,10 +683,11 @@ async def sync_gmail(
                     "classification": classification.category,
                     "confidence": classification.confidence,
                     "facts_extracted": len(facts),
+                    "low_confidence_items": low_confidence_items,
                     "labeled": labeled,
                     "timestamp": msg.timestamp.isoformat(),
                 })
-                
+
             except Exception as e:
                 # Log error but continue with other emails
                 error_msg = f"Error processing email {msg.message_id}: {str(e)}"
@@ -579,14 +699,7 @@ async def sync_gmail(
                     "timestamp": msg.timestamp.isoformat(),
                 })
                 continue
-        
-        # Run reconciliation for all affected drives
-        for drive_id in drives_affected:
-            try:
-                reconcile_facts_for_drive(db, drive_id, persist=True)
-            except Exception as e:
-                errors.append(f"Reconciliation failed for {drive_id}: {str(e)}")
-        
+
         return SyncGmailResponse(
             success=True,
             emails_fetched=len(messages),
@@ -773,7 +886,7 @@ def _normalize_drive_id(company_name: str) -> str:
 
 
 @router.post("/sync-portal", response_model=SyncPortalResponse)
-async def sync_portal(
+def sync_portal(
     db: Session = Depends(get_db),
 ):
     """Sync placement events from Student Portal (SIS) and process them.
@@ -880,52 +993,60 @@ async def sync_portal(
                         company_name=company_name,
                     )
                 
-                # Extract criteria from portal event
-                facts = extract_criteria_from_notice(
+                # Extract criteria from portal event, holding back
+                # low-confidence facts instead of silently applying them.
+                facts, low_confidence_items = extract_with_confidence(
                     notice_text=msg.body,
                     source_id=msg.message_id,
                     source_type=msg.source_type,
                     timestamp=msg.timestamp,
                     drive_id=drive_id,
+                    min_confidence=settings.extraction_min_confidence,
                     llm_client=llm_client,
                 )
+                _merge_branch_delta_facts(db, facts)
                 
                 # Store facts
                 for fact in facts:
                     db.add(fact)
                 db.commit()
-                
+                _index_facts_best_effort(facts)
+
                 total_facts += len(facts)
                 drives_affected.add(drive_id)
                 events_processed += 1
-                
+
+                # Reconcile this drive immediately, not batched at the end of
+                # the loop - if a later event in this batch fails or the
+                # request gets interrupted, this event's facts are still
+                # reflected in ExtractedCriterion rather than stranded.
+                try:
+                    reconcile_facts_for_drive_rag(
+                        db, drive_id, persist=True, use_rag=settings.vector_store_enabled
+                    )
+                except Exception as e:
+                    errors.append(f"Reconciliation failed for {drive_id}: {str(e)}")
+
                 details.append({
                     "message_id": msg.message_id,
                     "company_name": company_name,
                     "drive_id": drive_id,
                     "source_type": msg.source_type.value,
                     "facts_extracted": len(facts),
+                    "low_confidence_items": low_confidence_items,
                     "status": "success",
                     "timestamp": msg.timestamp.isoformat(),
                 })
-                
+
             except Exception as e:
                 error_msg = f"Failed to process portal event {msg.message_id}: {str(e)}"
                 errors.append(error_msg)
-                
+
                 details.append({
                     "message_id": msg.message_id,
                     "status": "error",
                     "error": str(e),
                 })
-        
-        # Run reconciliation for all affected drives
-        for drive_id in drives_affected:
-            try:
-                reconcile_facts_for_drive(db, drive_id, persist=True)
-            except Exception as e:
-                error_msg = f"Reconciliation failed for {drive_id}: {str(e)}"
-                errors.append(error_msg)
         
         return SyncPortalResponse(
             success=True,

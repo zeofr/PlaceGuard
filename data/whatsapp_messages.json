@@ -1,0 +1,97 @@
+[
+  {
+    "drive_id": "DRIVE_VERTEXSOFT",
+    "company": "VertexSoft Solutions",
+    "source_id": "whatsapp_vertexsoft_001",
+    "source_type": "placement_cell_whatsapp",
+    "authority_rank": 2,
+    "timestamp": "2026-10-21T09:30:00",
+    "text": "VertexSoft\n\nCorrection: the CGPA requirement is 7.0, not 7.5, as stated in the earlier email. Branches and backlog rule stay the same (CSE, ISE only, no active backlogs).\n\n— Placement Cell",
+    "message_id": "N_VERTEXSOFT_002"
+  },
+  {
+    "drive_id": "DRIVE_VERTEXSOFT",
+    "company": "VertexSoft Solutions",
+    "source_id": "student_whatsapp_vertexsoft_001",
+    "source_type": "student_whatsapp",
+    "authority_rank": 5,
+    "timestamp": "2026-10-23T08:00:00",
+    "note": "Forwarded verbatim copy of the original (now-superseded) email, still quoting 7.5 CGPA.",
+    "text": "Fwd: VertexSoft Solutions — Campus Hiring 2027\n\nRole: Associate Software Engineer\n\nEligibility Criteria:\nMinimum CGPA: 7.5 and above\nBranches eligible: CSE, ISE only\nNo active backlogs\n\nCompensation: 6.5 LPA\nLocation: Bangalore\n\nLink to apply: https://forms.gle/vxs2027reg\nDeadline: 23-10-2026, 6 PM",
+    "message_id": "N_VERTEXSOFT_003"
+  },
+  {
+    "drive_id": "DRIVE_BRIGHTWAVE",
+    "company": "BrightWave Technologies",
+    "source_id": "coordinator_whatsapp_brightwave_001",
+    "source_type": "coordinator_whatsapp",
+    "authority_rank": 3,
+    "timestamp": "2026-10-19T14:00:00",
+    "note": "Coordinator rumor that conflicts with the official PDF — PDF (rank 1) must win regardless of recency.",
+    "text": "Hi all, heard from a senior that BrightWave is actually open to all branches this year and the CGPA cutoff is only 6.5, no backlog restriction either. Will confirm but thought I'd give you a heads up.\n\n— Placement Coordinator",
+    "message_id": "N_BRIGHTWAVE_002"
+  },
+  {
+    "drive_id": "DRIVE_CLOUDPEAK",
+    "company": "CloudPeak Systems",
+    "source_id": "student_whatsapp_cloudpeak_001",
+    "source_type": "student_whatsapp",
+    "authority_rank": 5,
+    "timestamp": "2026-10-24T19:00:00",
+    "note": "Unverified student rumor, should be ignored in favor of the official email.",
+    "text": "guys someone in the CloudPeak WA group said the actual cutoff is 6.5 CGPA only, not 7.5. not sure if true though lol",
+    "message_id": "N_CLOUDPEAK_002"
+  },
+  {
+    "drive_id": "DRIVE_ORBITALTECH",
+    "company": "OrbitalTech Aerospace",
+    "source_id": "whatsapp_orbitaltech_001",
+    "source_type": "placement_cell_whatsapp",
+    "authority_rank": 2,
+    "timestamp": "2026-10-17T16:00:00",
+    "text": "OrbitalTech\n\nCorrection: the backlog rule has been relaxed — up to 2 active backlogs are allowed now (earlier email said no backlogs). All other criteria (CGPA 8.0+, branches CSE/ISE/ECE/EEE, 70% in 10th & 12th) remain unchanged.\n\n— Placement Cell",
+    "message_id": "N_ORBITALTECH_002"
+  },
+  {
+    "drive_id": "DRIVE_SILVERLINE",
+    "company": "SilverLine Analytics",
+    "source_id": "whatsapp_silverline_001",
+    "source_type": "placement_cell_whatsapp",
+    "authority_rank": 2,
+    "timestamp": "2026-10-18T12:00:00",
+    "text": "SilverLine\n\nCorrection: the full and final list of eligible branches is CSE, ISE and ECE (updated list, replaces the branches mentioned earlier). CGPA (7.0+) and backlog rule (no active backlogs) stay the same.\n\n— Placement Cell",
+    "message_id": "N_SILVERLINE_002"
+  },
+  {
+    "drive_id": "DRIVE_NIMBUSWORKS",
+    "company": "NimbusWorks Cloud",
+    "source_id": "whatsapp_nimbusworks_001",
+    "source_type": "placement_cell_whatsapp",
+    "authority_rank": 2,
+    "timestamp": "2026-10-16T15:00:00",
+    "text": "NimbusWorks\n\nCorrection: the full and final list of eligible branches is CSE and ECE only — ISE has been removed from eligibility. CGPA requirement (6.5+) is unchanged.\n\n— Placement Cell",
+    "message_id": "N_NIMBUSWORKS_002"
+  },
+  {
+    "drive_id": "DRIVE_NIMBUSWORKS",
+    "company": "NimbusWorks Cloud",
+    "source_id": "student_whatsapp_nimbusworks_001",
+    "source_type": "student_whatsapp",
+    "authority_rank": 5,
+    "timestamp": "2026-10-20T21:00:00",
+    "note": "Forwarded copy of the original pre-correction email — ISE was already removed by the official correction above and this forward must be ignored.",
+    "text": "Fwd: NimbusWorks Cloud — Campus Hiring 2027\n\nRole: Cloud Support Engineer\n\nEligibility Criteria:\nMinimum CGPA: 6.5 and above\nBranches eligible: CSE, ECE, ISE\n\nCompensation: 6 LPA\n\nLink to apply: https://forms.gle/nimbusworks2027\nDeadline: 19-10-2026, 5 PM",
+    "message_id": "N_NIMBUSWORKS_003"
+  },
+  {
+    "drive_id": "DRIVE_QUANTUMEDGE",
+    "company": "QuantumEdge Systems",
+    "source_id": "student_whatsapp_quantumedge_001",
+    "source_type": "student_whatsapp",
+    "authority_rank": 5,
+    "timestamp": "2026-10-15T20:00:00",
+    "note": "Unverified rumor, must lose to the official PDF regardless of recency.",
+    "text": "heard from a friend that quantumedge cutoff is only 6.0 CGPA and its open to all branches this time, can anyone confirm?",
+    "message_id": "N_QUANTUMEDGE_002"
+  }
+]
