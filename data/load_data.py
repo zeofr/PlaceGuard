@@ -17,11 +17,7 @@ from core.schemas import Student as StudentSchema
 from database import crud, init_db
 from database.connection import get_db_context
 from database.vector_indexing import reindex_all_facts
-
-# Import the manual criteria loader
-import sys
-sys.path.insert(0, str(Path(__file__).parent))
-from load_manual_criteria import load_manual_criteria
+from data.load_notices_via_llm import load_notices_via_llm
 
 DATA_DIR = Path(__file__).parent
 STUDENTS_FILE = DATA_DIR / "students.json"
@@ -86,13 +82,18 @@ def main() -> None:
     with get_db_context() as db:
         s = load_students(db)
         d = load_drives(db)
-        c = load_manual_criteria(db)
         print(f"  ✓ Inserted {s} student(s)")
         print(f"  ✓ Inserted {d} drive(s)")
-        print(f"  ✓ Inserted {c} eligibility criteria")
         print()
 
-        print("Indexing seeded facts into the vector store...")
+        print("Extracting criteria from notices via the real LLM pipeline...")
+        notice_stats = load_notices_via_llm(db)
+        print(f"  ✓ Processed {notice_stats['processed']} source(s), "
+              f"skipped {notice_stats['skipped']} already-ingested, "
+              f"extracted {notice_stats['facts']} fact(s) across {len(notice_stats['drives'])} drive(s)")
+        print()
+
+        print("Indexing extracted facts into the vector store...")
         indexed = reindex_all_facts(db)
         print(f"  ✓ Indexed {indexed} notice(s) into the vector store")
         print()
@@ -102,10 +103,11 @@ def main() -> None:
     print("=" * 70)
     print()
     print("📊 Dataset includes:")
-    print("  • 30 students with diverse profiles (CSE, AI&ML, Cybersecurity, IT, ECE, etc.)")
-    print("  • 11 companies (Tech Mahindra, KPMG, Boeing, Morphle, Aptos, GE, etc.)")
-    print("  • 13 realistic notices based on actual emails/WhatsApp")
-    print("  • Edge cases: null CGPA, specialized branches, KPMG deadline conflict")
+    print("  • Students with diverse profiles (CSE, AI&ML, Cybersecurity, IT, ECE, etc.)")
+    print("  • All companies/drives referenced in data/notices.json")
+    print("  • Criteria extracted live via the LLM (Ollama by default) from the real")
+    print("    notice/WhatsApp text, not hardcoded — includes registration links,")
+    print("    deadline conflicts, and branch-list corrections where present")
     print()
     print("🔐 Test login credentials (USN / date_of_birth):")
     students = json.loads(STUDENTS_FILE.read_text(encoding="utf-8"))
@@ -123,9 +125,8 @@ def main() -> None:
     print()
     print("  3. Open http://localhost:3000 and login with any USN above")
     print()
-    print("💡 Note: To extract criteria from notices, you'll need a Gemini API key")
-    print("   Get one at: https://makersuite.google.com/app/apikey")
-    print("   Then update .env: GEMINI_API_KEY=your_key_here")
+    print("💡 Note: criteria extraction above used LLM_PROVIDER from .env (Ollama by")
+    print("   default — see STARTUP.md). Switch to Gemini/OpenAI/Claude there if preferred.")
     print()
 
 

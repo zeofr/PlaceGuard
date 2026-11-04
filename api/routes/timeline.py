@@ -20,6 +20,7 @@ from api.routes.auth import get_current_student
 from database.connection import get_db
 from database.crud import get_current_criteria, get_drive, get_drive_timeline
 from database.models import Student
+from rules.eligibility_engine import METADATA_ONLY_CRITERION_TYPES
 
 router = APIRouter(prefix="/timeline", tags=["timeline"])
 
@@ -119,9 +120,14 @@ def get_drive_timeline_view(
     if not drive:
         raise HTTPException(status_code=404, detail="Drive not found")
 
-    # Current reconciled criteria
+    # Current reconciled criteria (metadata like registration_link is excluded
+    # from this "requirements" list — it's surfaced separately below)
     criteria_db = get_current_criteria(db, drive_id)
-    current = [CurrentCriterion.model_validate(c) for c in criteria_db]
+    current = [
+        CurrentCriterion.model_validate(c)
+        for c in criteria_db
+        if c.criterion_type not in METADATA_ONLY_CRITERION_TYPES
+    ]
 
     # Full chronological fact log
     facts = get_drive_timeline(db, drive_id)
@@ -144,10 +150,18 @@ def get_drive_timeline_view(
             )
         )
 
-    # Only reveal the registration link if the student has already registered
+    # Only reveal the registration link if the student has already registered.
+    # The link itself comes from the same reconciled criteria as everything
+    # else (criterion_type="registration_link"), not a separately-set field.
     from database.crud import get_registration
     reg = get_registration(db, student.usn, drive_id)
-    reg_link = drive.registration_link if reg else None
+    reg_link = None
+    if reg:
+        link_criterion = next(
+            (c for c in criteria_db if c.criterion_type == "registration_link"), None
+        )
+        if link_criterion:
+            reg_link = json.loads(link_criterion.value)
 
     return DriveTimelineResponse(
         drive_id=drive.drive_id,

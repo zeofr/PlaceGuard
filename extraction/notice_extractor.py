@@ -116,6 +116,11 @@ Required criterion types (use EXACTLY as written):
 - min_12th_pct: Minimum 12th percentage (use "min_12th_pct", NOT "min_twelfth_pct")
 - no_prior_offer: Prior offer restrictions (e.g., "students with offers cannot apply")
 - deadline: Registration deadline (MUST be in ISO format: YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS)
+- registration_link: The URL students use to register/apply (e.g., "Link to apply: https://...",
+  "Register here: https://forms.gle/...", "🔗 Fill out form: https://..."). Extract the URL exactly
+  as written, with operator "eq". This is informational, not an eligibility rule — extract it
+  whenever a notice contains an application/registration URL, even if the rest of the notice has
+  no other extractable criteria.
 
 NAMING RULES - VERY IMPORTANT:
 ✓ CORRECT: min_10th_pct, min_12th_pct
@@ -197,6 +202,7 @@ For "criterion_type": "allowed_branches" ONLY, also include "list_operation": "a
 "replace" per the ALLOWED_BRANCHES LIST_OPERATION rules above.
 
 EXAMPLE outputs:
+- For "Link to apply: https://forms.gle/abc123": {"criterion_type": "registration_link", "operator": "eq", "value": "https://forms.gle/abc123", ...}
 - For "70% in 12th": {"criterion_type": "min_12th_pct", "operator": "gte", "value": "70", ...}
 - For "60% in 10th": {"criterion_type": "min_10th_pct", "operator": "gte", "value": "60", ...}
 - For "CSE and ISE only": {"criterion_type": "allowed_branches", "operator": "in", "value": "CSE,ISE", "list_operation": "replace", ...}
@@ -240,6 +246,11 @@ CRITERION_TYPE_ALIASES: dict[str, str] = {
     'tenth_percentage': 'min_10th_pct',
     'twelfth_percentage': 'min_12th_pct',
     'branch': 'allowed_branches',
+    'apply_link': 'registration_link',
+    'application_link': 'registration_link',
+    'registration_url': 'registration_link',
+    'apply_url': 'registration_link',
+    'link_to_apply': 'registration_link',
 }
 
 

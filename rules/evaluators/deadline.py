@@ -7,6 +7,8 @@ from __future__ import annotations
 
 from datetime import date, datetime
 
+from dateutil import parser as date_parser
+
 from core.schemas import Criterion, CriterionResult, Status, Student
 from rules.evaluators.registry import register
 
@@ -21,11 +23,14 @@ def evaluate_deadline(criterion: Criterion, student: Student) -> CriterionResult
     """
     deadline_value = criterion.value
     
-    # Parse the deadline if it's a string
+    # Parse the deadline if it's a string. Extraction normalizes deadlines to
+    # either "YYYY-MM-DD" or "YYYY-MM-DDTHH:MM:SS" (notice_extractor.py's
+    # normalize_deadline_value) depending on whether a time was mentioned, so
+    # this must accept both.
     if isinstance(deadline_value, str):
         try:
-            deadline_date = datetime.strptime(deadline_value, "%Y-%m-%d").date()
-        except ValueError:
+            deadline_date = date_parser.parse(deadline_value).date()
+        except (ValueError, TypeError):
             return CriterionResult(
                 criterion=criterion,
                 status=Status.UNKNOWN,

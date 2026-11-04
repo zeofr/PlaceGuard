@@ -175,23 +175,18 @@ def load_portal_data(use_llm: bool = False) -> dict:
 
 def main() -> None:
     """Main entry point."""
-    import os
-    
-    # Check if Gemini API key is set
-    has_api_key = bool(os.getenv("GEMINI_API_KEY"))
-    
-    if not has_api_key:
-        print("⚠️  GEMINI_API_KEY not found in environment")
+    # Try the LLM provider actually configured in .env (LLM_PROVIDER — Ollama,
+    # Gemini, OpenAI, or Claude), not just a hardcoded Gemini-key check, so
+    # local Ollama users get real extraction too instead of silently skipping it.
+    try:
+        get_llm_client()
+        use_llm = True
+    except ValueError as e:
+        print(f"⚠️  LLM client unavailable ({e})")
         print("   Portal events will be loaded WITHOUT criteria extraction.")
         print()
-        print("To enable full extraction:")
-        print("   1. Get API key: https://makersuite.google.com/app/apikey")
-        print("   2. Add to .env: GEMINI_API_KEY=your_key_here")
-        print()
         use_llm = False
-    else:
-        use_llm = True
-    
+
     stats = load_portal_data(use_llm=use_llm)
     
     print("=" * 70)

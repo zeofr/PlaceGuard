@@ -11,8 +11,17 @@ from __future__ import annotations
 from core.schemas import Criterion, EligibilityResult, EligibilityStatus, Status, Student
 from rules.evaluators import get_evaluator
 
+# Criterion types that carry metadata extracted from a notice (e.g. the
+# registration form URL) rather than an eligibility rule. They have no
+# evaluator and must never reach the rule engine — they still go through
+# the same extraction/reconciliation pipeline as every other criterion type
+# (so authority + recency resolve conflicting links the same way), callers
+# just read them back directly instead of evaluating them here.
+METADATA_ONLY_CRITERION_TYPES = {"registration_link"}
+
 
 def evaluate_eligibility(student: Student, criteria: list[Criterion]) -> EligibilityResult:
+    criteria = [c for c in criteria if c.criterion_type not in METADATA_ONLY_CRITERION_TYPES]
     results = [get_evaluator(criterion.criterion_type)(criterion, student) for criterion in criteria]
 
     statuses = {result.status for result in results}

@@ -154,6 +154,75 @@ After loading sample data, you can log in with any of these test accounts:
 
 ---
 
+## 📨 Ingesting Test Notices
+
+Two ways to feed new placement notices into the pipeline (extraction → reconciliation →
+rule engine) without waiting on real Gmail/WhatsApp integrations. Both require the backend
+server running (`uvicorn api.main:app --reload --port 8000`).
+
+### Mock WhatsApp Console
+
+A small web UI for posting WhatsApp-style messages (placement cell, coordinator, or student),
+which get auto-processed into Facts a few seconds after posting.
+
+```bash
+uvicorn ingestion.mock_whatsapp.console:app --reload --port 8001
+```
+
+Open **http://localhost:8001**, pick a sender role, write a message (e.g. "Tech Mahindra
+minimum CGPA changed to 6.5"), and submit. It's processed automatically in the background —
+no extra command needed. To trigger processing manually instead (e.g. if auto-processing is
+disabled or you posted while the API server was down):
+
+```bash
+curl -X POST http://localhost:8000/ingest/process-whatsapp
+```
+
+```powershell
+Invoke-RestMethod -Method Post -Uri http://localhost:8000/ingest/process-whatsapp
+```
+
+### Manual Email Notice Ingestion
+
+There's no console UI for email — post the notice text directly to the generic ingestion
+endpoint instead, with `source_type` set to the email channel:
+
+```bash
+curl -X POST http://localhost:8000/ingest/notice \
+  -H "Content-Type: application/json" \
+  -d '{
+        "notice_text": "TechCorp hiring 2027 — CGPA 7.5+, CSE/ISE only, no active backlogs. Link to apply: https://forms.gle/example",
+        "source_id": "manual_email_techcorp_001",
+        "source_type": "placement_cell_email",
+        "drive_id": "DRIVE_TECHCORP",
+        "drive_name": "TechCorp"
+      }'
+```
+
+```powershell
+Invoke-RestMethod -Method Post -Uri http://localhost:8000/ingest/notice `
+  -ContentType "application/json" `
+  -Body (@{
+      notice_text = "TechCorp hiring 2027 — CGPA 7.5+, CSE/ISE only, no active backlogs. Link to apply: https://forms.gle/example"
+      source_id   = "manual_email_techcorp_001"
+      source_type = "placement_cell_email"
+      drive_id    = "DRIVE_TECHCORP"
+      drive_name  = "TechCorp"
+  } | ConvertTo-Json)
+```
+
+- `source_id` must be unique per message (re-posting the same `source_id` is a no-op — Facts
+  are append-only and never re-extracted).
+- `source_type` can be any of: `official_company_pdf`, `placement_cell_email`,
+  `placement_cell_whatsapp`, `coordinator_whatsapp`, `student_portal`, `student_whatsapp` —
+  this is what sets the message's authority rank for reconciliation.
+- `timestamp` is optional (defaults to now); pass an ISO datetime to backdate a message when
+  testing temporal-conflict scenarios.
+- The same endpoint also works for WhatsApp-style text if you'd rather skip the console —
+  just set `source_type` to one of the WhatsApp values above.
+
+---
+
 ## 📁 Project Structure
 
 ```

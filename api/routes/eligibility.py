@@ -135,7 +135,16 @@ async def check_eligibility_endpoint(
                 )
             except Exception:
                 pass  # unique constraint hit — already registered
-        registration_link = drive.registration_link
+
+        # The link itself is extracted from notices like any other criterion
+        # (criterion_type="registration_link") and goes through the same
+        # authority/recency reconciliation, so this picks up whichever
+        # source currently has the most authoritative link on file.
+        link_criterion = next(
+            (c for c in criteria_db if c.criterion_type == "registration_link"), None
+        )
+        if link_criterion:
+            registration_link = _json.loads(link_criterion.value)
 
     # Generate explanation if requested
     explanation = None
