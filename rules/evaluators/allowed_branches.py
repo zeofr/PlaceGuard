@@ -32,15 +32,19 @@ def evaluate_allowed_branches(criterion: Criterion, student: Student) -> Criteri
 
     # Normalise value: accept both list and comma-separated string
     raw = criterion.value
-    if isinstance(raw, list):
-        allowed: list[str] = [b.strip().upper() for b in raw]
-    elif isinstance(raw, str):
-        allowed = [b.strip().upper() for b in raw.split(",")]
-    else:
-        allowed = [str(raw).upper()]
-
     student_branch = student.branch.strip().upper()
-    passed = student_branch in allowed
+
+    if isinstance(raw, str) and raw.strip().upper() == "ALL":
+        allowed = "ALL"
+        passed = True
+    else:
+        if isinstance(raw, list):
+            allowed = [b.strip().upper() for b in raw]
+        elif isinstance(raw, str):
+            allowed = [b.strip().upper() for b in raw.split(",")]
+        else:
+            allowed = [str(raw).upper()]
+        passed = student_branch in allowed
 
     return CriterionResult(
         criterion=criterion,

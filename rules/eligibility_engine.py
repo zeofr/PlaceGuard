@@ -9,7 +9,7 @@ is never silently treated as a pass.
 from __future__ import annotations
 
 from core.schemas import Criterion, EligibilityResult, EligibilityStatus, Status, Student
-from rules.evaluators import get_evaluator
+from rules.evaluators import get_evaluator, registered_types
 
 # Criterion types that carry metadata extracted from a notice (e.g. the
 # registration form URL) rather than an eligibility rule. They have no
@@ -21,7 +21,23 @@ METADATA_ONLY_CRITERION_TYPES = {"registration_link"}
 
 
 def evaluate_eligibility(student: Student, criteria: list[Criterion]) -> EligibilityResult:
-    criteria = [c for c in criteria if c.criterion_type not in METADATA_ONLY_CRITERION_TYPES]
+    known_types = set(registered_types())
+    evaluable: list[Criterion] = []
+    for c in criteria:
+        if c.criterion_type in METADATA_ONLY_CRITERION_TYPES:
+            continue
+        if c.criterion_type not in known_types:
+            # Extraction can invent a criterion type we've never seen (a new
+            # synonym, a field this system doesn't track, etc.). Treating this
+            # as "no opinion" rather than crashing the whole eligibility check
+            # matches how METADATA_ONLY_CRITERION_TYPES is already handled above.
+            print(
+                f"WARNING: No evaluator registered for criterion_type={c.criterion_type!r} "
+                f"- skipping (not counted toward eligibility)."
+            )
+            continue
+        evaluable.append(c)
+    criteria = evaluable
     results = [get_evaluator(criterion.criterion_type)(criterion, student) for criterion in criteria]
 
     statuses = {result.status for result in results}

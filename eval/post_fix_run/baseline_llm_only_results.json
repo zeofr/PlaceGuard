@@ -1,0 +1,702 @@
+[
+  {
+    "case_id": "CASE_001",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 3434.88
+  },
+  {
+    "case_id": "CASE_002",
+    "expected": "INELIGIBLE",
+    "predicted": "INELIGIBLE",
+    "correct": true,
+    "latency_ms": 861.1
+  },
+  {
+    "case_id": "CASE_003",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 854.88
+  },
+  {
+    "case_id": "CASE_004",
+    "expected": "UNKNOWN",
+    "predicted": "ELIGIBLE",
+    "correct": false,
+    "latency_ms": 754.47
+  },
+  {
+    "case_id": "CASE_005",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 781.47
+  },
+  {
+    "case_id": "CASE_006",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 749.29
+  },
+  {
+    "case_id": "CASE_007",
+    "expected": "INELIGIBLE",
+    "predicted": "INELIGIBLE",
+    "correct": true,
+    "latency_ms": 724.03
+  },
+  {
+    "case_id": "CASE_008",
+    "expected": "INELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": false,
+    "latency_ms": 734.02
+  },
+  {
+    "case_id": "CASE_009",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 807.86
+  },
+  {
+    "case_id": "CASE_010",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 895.14
+  },
+  {
+    "case_id": "CASE_011",
+    "expected": "INELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": false,
+    "latency_ms": 835.19
+  },
+  {
+    "case_id": "CASE_012",
+    "expected": "UNKNOWN",
+    "predicted": "ELIGIBLE",
+    "correct": false,
+    "latency_ms": 1026.01
+  },
+  {
+    "case_id": "CASE_013",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 919.39
+  },
+  {
+    "case_id": "CASE_014",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 686.16
+  },
+  {
+    "case_id": "CASE_015",
+    "expected": "INELIGIBLE",
+    "predicted": "INELIGIBLE",
+    "correct": true,
+    "latency_ms": 787.35
+  },
+  {
+    "case_id": "CASE_016",
+    "expected": "INELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": false,
+    "latency_ms": 763.72
+  },
+  {
+    "case_id": "CASE_017",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 758.39
+  },
+  {
+    "case_id": "CASE_018",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 758.25
+  },
+  {
+    "case_id": "CASE_019",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 675.69
+  },
+  {
+    "case_id": "CASE_020",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 761.48
+  },
+  {
+    "case_id": "CASE_021",
+    "expected": "INELIGIBLE",
+    "predicted": "INELIGIBLE",
+    "correct": true,
+    "latency_ms": 909.78
+  },
+  {
+    "case_id": "CASE_022",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 750.65
+  },
+  {
+    "case_id": "CASE_023",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 829.83
+  },
+  {
+    "case_id": "CASE_024",
+    "expected": "INELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": false,
+    "latency_ms": 800.73
+  },
+  {
+    "case_id": "CASE_025",
+    "expected": "INELIGIBLE",
+    "predicted": "INELIGIBLE",
+    "correct": true,
+    "latency_ms": 803.12
+  },
+  {
+    "case_id": "CASE_026",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 874.71
+  },
+  {
+    "case_id": "CASE_027",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 714.27
+  },
+  {
+    "case_id": "CASE_028",
+    "expected": "INELIGIBLE",
+    "predicted": "INELIGIBLE",
+    "correct": true,
+    "latency_ms": 768.77
+  },
+  {
+    "case_id": "CASE_029",
+    "expected": "INELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": false,
+    "latency_ms": 715.28
+  },
+  {
+    "case_id": "CASE_030",
+    "expected": "INELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": false,
+    "latency_ms": 691.33
+  },
+  {
+    "case_id": "CASE_031",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 739.41
+  },
+  {
+    "case_id": "CASE_032",
+    "expected": "INELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": false,
+    "latency_ms": 883.81
+  },
+  {
+    "case_id": "CASE_033",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 964.75
+  },
+  {
+    "case_id": "CASE_034",
+    "expected": "INELIGIBLE",
+    "predicted": "INELIGIBLE",
+    "correct": true,
+    "latency_ms": 936.39
+  },
+  {
+    "case_id": "CASE_035",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 818.07
+  },
+  {
+    "case_id": "CASE_036",
+    "expected": "UNKNOWN",
+    "predicted": "INELIGIBLE",
+    "correct": false,
+    "latency_ms": 724.85
+  },
+  {
+    "case_id": "CASE_037",
+    "expected": "UNKNOWN",
+    "predicted": "ELIGIBLE",
+    "correct": false,
+    "latency_ms": 631.94
+  },
+  {
+    "case_id": "CASE_038",
+    "expected": "UNKNOWN",
+    "predicted": "ELIGIBLE",
+    "correct": false,
+    "latency_ms": 738.18
+  },
+  {
+    "case_id": "CASE_039",
+    "expected": "UNKNOWN",
+    "predicted": "ELIGIBLE",
+    "correct": false,
+    "latency_ms": 749.71
+  },
+  {
+    "case_id": "CASE_040",
+    "expected": "INELIGIBLE",
+    "predicted": "INELIGIBLE",
+    "correct": true,
+    "latency_ms": 853.23
+  },
+  {
+    "case_id": "CASE_041",
+    "expected": "INELIGIBLE",
+    "predicted": "INELIGIBLE",
+    "correct": true,
+    "latency_ms": 902.37
+  },
+  {
+    "case_id": "CASE_042",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 778.63
+  },
+  {
+    "case_id": "CASE_043",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 698.74
+  },
+  {
+    "case_id": "CASE_044",
+    "expected": "INELIGIBLE",
+    "predicted": "INELIGIBLE",
+    "correct": true,
+    "latency_ms": 772.95
+  },
+  {
+    "case_id": "CASE_045",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 640.44
+  },
+  {
+    "case_id": "CASE_046",
+    "expected": "INELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": false,
+    "latency_ms": 695.3
+  },
+  {
+    "case_id": "CASE_047",
+    "expected": "INELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": false,
+    "latency_ms": 600.76
+  },
+  {
+    "case_id": "CASE_048",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 641.84
+  },
+  {
+    "case_id": "CASE_049",
+    "expected": "INELIGIBLE",
+    "predicted": "INELIGIBLE",
+    "correct": true,
+    "latency_ms": 617.91
+  },
+  {
+    "case_id": "CASE_050",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 591.36
+  },
+  {
+    "case_id": "CASE_051",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 823.37
+  },
+  {
+    "case_id": "CASE_052",
+    "expected": "INELIGIBLE",
+    "predicted": "INELIGIBLE",
+    "correct": true,
+    "latency_ms": 902.15
+  },
+  {
+    "case_id": "CASE_053",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 801.42
+  },
+  {
+    "case_id": "CASE_054",
+    "expected": "UNKNOWN",
+    "predicted": "ELIGIBLE",
+    "correct": false,
+    "latency_ms": 753.83
+  },
+  {
+    "case_id": "CASE_055",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 776.2
+  },
+  {
+    "case_id": "CASE_056",
+    "expected": "ELIGIBLE",
+    "predicted": "INELIGIBLE",
+    "correct": false,
+    "latency_ms": 774.64
+  },
+  {
+    "case_id": "CASE_057",
+    "expected": "INELIGIBLE",
+    "predicted": "INELIGIBLE",
+    "correct": true,
+    "latency_ms": 756.54
+  },
+  {
+    "case_id": "CASE_058",
+    "expected": "UNKNOWN",
+    "predicted": "INELIGIBLE",
+    "correct": false,
+    "latency_ms": 716.61
+  },
+  {
+    "case_id": "CASE_059",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 681.28
+  },
+  {
+    "case_id": "CASE_060",
+    "expected": "ELIGIBLE",
+    "predicted": "INELIGIBLE",
+    "correct": false,
+    "latency_ms": 789.17
+  },
+  {
+    "case_id": "CASE_061",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 1347.26
+  },
+  {
+    "case_id": "CASE_062",
+    "expected": "INELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": false,
+    "latency_ms": 1149.81
+  },
+  {
+    "case_id": "CASE_063",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 1313.4
+  },
+  {
+    "case_id": "CASE_064",
+    "expected": "UNKNOWN",
+    "predicted": "ELIGIBLE",
+    "correct": false,
+    "latency_ms": 1246.84
+  },
+  {
+    "case_id": "CASE_065",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 995.52
+  },
+  {
+    "case_id": "CASE_066",
+    "expected": "INELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": false,
+    "latency_ms": 833.86
+  },
+  {
+    "case_id": "CASE_067",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 813.1
+  },
+  {
+    "case_id": "CASE_068",
+    "expected": "INELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": false,
+    "latency_ms": 793.52
+  },
+  {
+    "case_id": "CASE_069",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 903.25
+  },
+  {
+    "case_id": "CASE_070",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 724.84
+  },
+  {
+    "case_id": "CASE_071",
+    "expected": "INELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": false,
+    "latency_ms": 842.86
+  },
+  {
+    "case_id": "CASE_072",
+    "expected": "INELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": false,
+    "latency_ms": 850.5
+  },
+  {
+    "case_id": "CASE_073",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 701.47
+  },
+  {
+    "case_id": "CASE_074",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 1065.79
+  },
+  {
+    "case_id": "CASE_075",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 1075.79
+  },
+  {
+    "case_id": "CASE_076",
+    "expected": "INELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": false,
+    "latency_ms": 1124.09
+  },
+  {
+    "case_id": "CASE_077",
+    "expected": "INELIGIBLE",
+    "predicted": "INELIGIBLE",
+    "correct": true,
+    "latency_ms": 1177.71
+  },
+  {
+    "case_id": "CASE_078",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 856.45
+  },
+  {
+    "case_id": "CASE_079",
+    "expected": "INELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": false,
+    "latency_ms": 763.42
+  },
+  {
+    "case_id": "CASE_080",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 666.08
+  },
+  {
+    "case_id": "CASE_081",
+    "expected": "UNKNOWN",
+    "predicted": "INELIGIBLE",
+    "correct": false,
+    "latency_ms": 761.55
+  },
+  {
+    "case_id": "CASE_082",
+    "expected": "INELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": false,
+    "latency_ms": 681.15
+  },
+  {
+    "case_id": "CASE_083",
+    "expected": "INELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": false,
+    "latency_ms": 779.38
+  },
+  {
+    "case_id": "CASE_084",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 850.17
+  },
+  {
+    "case_id": "CASE_085",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 865.61
+  },
+  {
+    "case_id": "CASE_086",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 728.27
+  },
+  {
+    "case_id": "CASE_087",
+    "expected": "UNKNOWN",
+    "predicted": "ELIGIBLE",
+    "correct": false,
+    "latency_ms": 863.13
+  },
+  {
+    "case_id": "CASE_088",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 690.36
+  },
+  {
+    "case_id": "CASE_089",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 782.41
+  },
+  {
+    "case_id": "CASE_090",
+    "expected": "INELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": false,
+    "latency_ms": 935.02
+  },
+  {
+    "case_id": "CASE_091",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 831.14
+  },
+  {
+    "case_id": "CASE_092",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 962.71
+  },
+  {
+    "case_id": "CASE_093",
+    "expected": "UNKNOWN",
+    "predicted": "ELIGIBLE",
+    "correct": false,
+    "latency_ms": 783.75
+  },
+  {
+    "case_id": "CASE_094",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 829.31
+  },
+  {
+    "case_id": "CASE_095",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 724.16
+  },
+  {
+    "case_id": "CASE_096",
+    "expected": "INELIGIBLE",
+    "predicted": "INELIGIBLE",
+    "correct": true,
+    "latency_ms": 962.61
+  },
+  {
+    "case_id": "CASE_097",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 909.4
+  },
+  {
+    "case_id": "CASE_098",
+    "expected": "INELIGIBLE",
+    "predicted": "INELIGIBLE",
+    "correct": true,
+    "latency_ms": 762.31
+  },
+  {
+    "case_id": "CASE_099",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 751.16
+  },
+  {
+    "case_id": "CASE_100",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 785.45
+  }
+]

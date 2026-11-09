@@ -2370,8 +2370,7 @@
         "value": [
           "CSE",
           "ECE",
-          "EEE",
-          "EE"
+          "EEE"
         ],
         "authoritative_source": "email_nvidia_001"
       }
@@ -2403,8 +2402,7 @@
         "value": [
           "CSE",
           "ECE",
-          "EEE",
-          "EE"
+          "EEE"
         ],
         "authoritative_source": "email_nvidia_001"
       }
@@ -2436,8 +2434,7 @@
         "value": [
           "CSE",
           "ECE",
-          "EEE",
-          "EE"
+          "EEE"
         ],
         "authoritative_source": "email_nvidia_001"
       }
@@ -3663,5 +3660,155 @@
     "provenance_reasoning_required": false,
     "category": "normal",
     "notes": ""
+  },
+  {
+    "case_id": "CASE_101",
+    "description": "OCR-sourced real notice (Cognizant Ace Team) + deadline-only correction; student comfortably eligible.",
+    "drive_id": "DRIVE_COGNIZANT_ACE",
+    "student_id": "1MS22CS038",
+    "notices_in_scope": [
+      "whatsapp_cognizant_ace_001",
+      "whatsapp_cognizant_ace_002"
+    ],
+    "expected_current_rules": {
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 60,
+        "authoritative_source": "whatsapp_cognizant_ace_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 60,
+        "authoritative_source": "whatsapp_cognizant_ace_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "whatsapp_cognizant_ace_001"
+      },
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 6.0,
+        "authoritative_source": "whatsapp_cognizant_ace_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": true,
+    "provenance_reasoning_required": true,
+    "category": "temporal_conflict",
+    "notes": "Real screenshot OCR test (data/images/notice_1.jpeg, notice_3.jpeg). notice_3 is a correction that revises ONLY the deadline, restating no other criteria -- tests that its presence in scope does not corrupt/reattribute notice_1's other facts. The notice states \"a consistent academic score of 60% across 10th, 12th and UG\" -- the UG portion is a PERCENTAGE with no native field on Student (0-10 CGPA scale only). Per the fixed Finding D (eval/result.md), extraction now deterministically converts any min_cgpa value > 10 by dividing by 10 (60 -> 6.0), since a CGPA can never exceed 10. The chosen student's CGPA (9.4) is eligible either way. No allowed_branches criterion: the notice states no branch restriction (open to all BE/BTech branches). KNOWN VARIANCE: the local 8B model does not reliably extract \"no standing arrears\" (-> max_backlogs=0) on every draw despite the arrears-synonym prompt addition -- this is the same residual LLM-recall non-determinism documented elsewhere in eval/result.md, not a deterministic bug; temporal_correct/provenance_correct for this case may read False on an unlucky draw even though eligibility is unaffected (9.4 CGPA, 95/92 pct pass regardless of whether backlogs=0 is captured)."
+  },
+  {
+    "case_id": "CASE_102",
+    "description": "OCR-sourced real notice (IDFC FIRST Bank); CS/IT branch restriction, student eligible.",
+    "drive_id": "DRIVE_IDFC",
+    "student_id": "1MS22IS017",
+    "notices_in_scope": [
+      "whatsapp_idfc_001"
+    ],
+    "expected_current_rules": {
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE"
+        ],
+        "authoritative_source": "whatsapp_idfc_001"
+      },
+      "min_10th_pct": {
+        "operator": "gte",
+        "value": 60,
+        "authoritative_source": "whatsapp_idfc_001"
+      },
+      "min_12th_pct": {
+        "operator": "gte",
+        "value": 60,
+        "authoritative_source": "whatsapp_idfc_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "whatsapp_idfc_001"
+      },
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 6.0,
+        "authoritative_source": "whatsapp_idfc_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": "Real screenshot OCR test (data/images/notice_4.jpeg). \"Only CS and IT students are eligible\" -> allowed_branches=[CSE,ISE] via existing BRANCH_ALIASES (\"it\"->ISE). Same UG-percentage-as-CGPA case as CASE_101 (\"60% and above throughout 10th, 12th & Graduation\") -- converted to min_cgpa=6.0 via the Finding D fix (value/10 when >10). Student CGPA (7.78) is eligible either way."
+  },
+  {
+    "case_id": "CASE_103",
+    "description": "OCR-sourced real notice (Ujjivan Small Finance Bank); non-standard branch wording resolved via alias pipeline.",
+    "drive_id": "DRIVE_UJJIVAN",
+    "student_id": "1MS22CY006",
+    "notices_in_scope": [
+      "whatsapp_ujjivan_001"
+    ],
+    "expected_current_rules": {
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE",
+          "CSE(AI&ML)",
+          "Cybersecurity"
+        ],
+        "authoritative_source": "whatsapp_ujjivan_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "whatsapp_ujjivan_001"
+      }
+    },
+    "expected_eligibility": "ELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": "Real screenshot OCR test (data/images/notice_5.jpeg). Notice lists \"Computer Science\" (->CSE), the \"IT\" team (->ISE), \"AML\" (->CSE(AI&ML)), and \"Websecurity\" (->Cybersecurity) -- the latter two required adding new BRANCH_ALIASES entries (extraction/notice_extractor.py) rather than hand-simplifying the expected value to just CSE. \"Data Science\"/\"Digital Transformation\" are correctly NOT mapped to any canonical branch (no such code exists in this system) and are omitted. No CGPA/percentage criterion stated in the notice at all, so none is asserted."
+  },
+  {
+    "case_id": "CASE_104",
+    "description": "OCR-sourced real notice (Eightfold AI); explicit CGPA threshold, student ineligible on CGPA.",
+    "drive_id": "DRIVE_EIGHTFOLD",
+    "student_id": "1MS22IS025",
+    "notices_in_scope": [
+      "whatsapp_eightfold_001"
+    ],
+    "expected_current_rules": {
+      "allowed_branches": {
+        "operator": "in",
+        "value": [
+          "CSE",
+          "ISE"
+        ],
+        "authoritative_source": "whatsapp_eightfold_001"
+      },
+      "min_cgpa": {
+        "operator": "gte",
+        "value": 8.5,
+        "authoritative_source": "whatsapp_eightfold_001"
+      },
+      "max_backlogs": {
+        "operator": "lte",
+        "value": 0,
+        "authoritative_source": "whatsapp_eightfold_001"
+      }
+    },
+    "expected_eligibility": "INELIGIBLE",
+    "expected_unknown": false,
+    "temporal_reasoning_required": false,
+    "provenance_reasoning_required": false,
+    "category": "normal",
+    "notes": "Real screenshot OCR test (data/images/notice_6.jpeg). Branch: \"Computer Science & Engineering / Information Technology\" -> [CSE,ISE]. CGPA here is an explicit numeric threshold (8.5), not a percentage -- unambiguous, unlike CASE_101/102. Student CGPA is 7.42 < 8.5 -> INELIGIBLE (branch and backlogs both pass, single clean failure). Notice also states \"Graduation Year: 2027\", which must NOT be extracted as a criterion per the existing extraction-prompt rule -- this case verifies that rule still holds when the notice arrives via OCR rather than typed text."
   }
 ]

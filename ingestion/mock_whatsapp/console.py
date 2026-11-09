@@ -10,9 +10,17 @@ Run with:
 
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
+# Windows consoles often default to a legacy codepage that can't encode the
+# emoji used in this module's print()s below; force UTF-8 so this runs anywhere.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
 import httpx
-from fastapi import FastAPI, Form, BackgroundTasks
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi import FastAPI, Form, File, UploadFile, BackgroundTasks, HTTPException
+from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 
 from core.schemas import SenderRole
 from ingestion.mock_whatsapp import store
@@ -32,6 +40,7 @@ def _render_page() -> str:
         f"<td>{m.sender_id}</td>"
         f"<td>{'yes' if m.is_forwarded else 'no'}</td>"
         f"<td>{m.body}</td>"
+        f"<td>{f'<img src=\"/media/{m.image_id}\" style=\"max-height:80px;max-width:140px\">' if m.image_id else ''}</td>"
         f"</tr>"
         for m in reversed(store.get_all())
     )
@@ -59,7 +68,7 @@ def _render_page() -> str:
         View timelines at <a href="http://localhost:3000" target="_blank">http://localhost:3000</a>
       </div>
 
-      <form action="/post" method="post" style="margin: 2rem 0;">
+      <form action="/post" method="post" enctype="multipart/form-data" style="margin: 2rem 0;">
         <div style="margin-bottom: 1rem;">
           <label><strong>Sender role:</strong>
             <select name="sender_role" style="margin-left: 10px; padding: 5px;">
@@ -84,10 +93,16 @@ def _render_page() -> str:
         </div>
 
         <div style="margin-bottom: 1rem;">
-          <label><strong>Message body:</strong><br>
-            <textarea name="body" rows="4" cols="60" required 
+          <label><strong>Message body (optional if attaching an image):</strong><br>
+            <textarea name="body" rows="4" cols="60"
               placeholder="Example: Tech Mahindra minimum CGPA changed to 6.5"
               style="margin-top: 5px; padding: 8px; font-family: sans-serif;"></textarea>
+          </label>
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <label><strong>Attach image (e.g. a screenshot of an email/message):</strong><br>
+            <input type="file" name="image" accept="image/*" style="margin-top: 5px;">
           </label>
         </div>
 
@@ -104,6 +119,7 @@ def _render_page() -> str:
           <th>Sender</th>
           <th>Forwarded</th>
           <th>Body</th>
+          <th>Image</th>
         </tr>
         {rows}
       </table>
@@ -157,24 +173,37 @@ async def post_message(
     background_tasks: BackgroundTasks,
     sender_role: str = Form(...),
     sender_id: str = Form(...),
-    body: str = Form(...),
+    body: str = Form(""),
     is_forwarded: str | None = Form(None),
+    image: UploadFile | None = File(None),
 ) -> RedirectResponse:
+    image_bytes: bytes | None = None
+    image_ext = ".png"
+    if image is not None and image.filename:
+        image_bytes = await image.read()
+        if image_bytes:
+            image_ext = Path(image.filename).suffix or ".png"
+
+    if not body.strip() and not image_bytes:
+        raise HTTPException(status_code=400, detail="Provide a message body, an image, or both.")
+
     # Store the message
     message = store.add_message(
         sender_id=sender_id,
         sender_role=SenderRole(sender_role),
         body=body,
         is_forwarded=is_forwarded is not None,
+        image_bytes=image_bytes,
+        image_ext=image_ext,
     )
-    
-    print(f"📱 New message posted: {body[:60]}...")
-    
+
+    print(f"📱 New message posted: {body[:60]}...{' [+image]' if image_bytes else ''}")
+
     # Trigger automatic processing in the background
     if AUTO_PROCESS_ENABLED:
         background_tasks.add_task(trigger_processing_in_background)
         print(f"   🔄 Auto-processing queued for message {message.message_id[:8]}")
-    
+
     return RedirectResponse(url="/", status_code=303)
 
 
@@ -182,3 +211,14 @@ async def post_message(
 def list_messages() -> list[dict]:
     """JSON view of the current message log — useful for the extraction stage to poll later."""
     return [m.model_dump(mode="json") for m in store.get_all()]
+
+
+@app.get("/media/{image_id}")
+def get_media(image_id: str) -> FileResponse:
+    """Serve an uploaded image by id — polled by the main API to run OCR on it."""
+    if "/" in image_id or "\\" in image_id or ".." in image_id:
+        raise HTTPException(status_code=400, detail="Invalid image id")
+    path = store.get_image_path(image_id)
+    if path is None:
+        raise HTTPException(status_code=404, detail="Image not found")
+    return FileResponse(path)

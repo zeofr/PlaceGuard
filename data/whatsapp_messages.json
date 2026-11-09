@@ -93,5 +93,60 @@
     "note": "Unverified rumor, must lose to the official PDF regardless of recency.",
     "text": "heard from a friend that quantumedge cutoff is only 6.0 CGPA and its open to all branches this time, can anyone confirm?",
     "message_id": "N_QUANTUMEDGE_002"
+  },
+  {
+    "drive_id": "DRIVE_COGNIZANT_ACE",
+    "company": "Cognizant",
+    "source_id": "whatsapp_cognizant_ace_001",
+    "source_type": "placement_cell_whatsapp",
+    "authority_rank": 2,
+    "timestamp": "2026-08-01T10:00:00",
+    "note": "Real screenshot, OCR-sourced (data/images/notice_1.jpeg). Original Cognizant Ace Team notice.",
+    "image_path": "data/images/notice_1.jpeg",
+    "message_id": "N_COGNIZANT_ACE_001"
+  },
+  {
+    "drive_id": "DRIVE_COGNIZANT_ACE",
+    "company": "Cognizant",
+    "source_id": "whatsapp_cognizant_ace_002",
+    "source_type": "placement_cell_whatsapp",
+    "authority_rank": 2,
+    "timestamp": "2026-08-09T09:00:00",
+    "note": "Real screenshot, OCR-sourced (data/images/notice_3.jpeg). Deadline-only correction to notice_1 — restates no other criteria.",
+    "image_path": "data/images/notice_3.jpeg",
+    "message_id": "N_COGNIZANT_ACE_002"
+  },
+  {
+    "drive_id": "DRIVE_IDFC",
+    "company": "IDFC FIRST Bank",
+    "source_id": "whatsapp_idfc_001",
+    "source_type": "placement_cell_whatsapp",
+    "authority_rank": 2,
+    "timestamp": "2026-07-01T11:00:00",
+    "note": "Real screenshot, OCR-sourced (data/images/notice_4.jpeg).",
+    "image_path": "data/images/notice_4.jpeg",
+    "message_id": "N_IDFC_001"
+  },
+  {
+    "drive_id": "DRIVE_UJJIVAN",
+    "company": "Ujjivan Small Finance Bank",
+    "source_id": "whatsapp_ujjivan_001",
+    "source_type": "placement_cell_whatsapp",
+    "authority_rank": 2,
+    "timestamp": "2026-07-02T17:20:00",
+    "note": "Real screenshot, OCR-sourced (data/images/notice_5.jpeg). Exercises websecurity/aml branch alias additions.",
+    "image_path": "data/images/notice_5.jpeg",
+    "message_id": "N_UJJIVAN_001"
+  },
+  {
+    "drive_id": "DRIVE_EIGHTFOLD",
+    "company": "Eightfold AI",
+    "source_id": "whatsapp_eightfold_001",
+    "source_type": "placement_cell_whatsapp",
+    "authority_rank": 2,
+    "timestamp": "2026-06-01T10:00:00",
+    "note": "Real screenshot, OCR-sourced (data/images/notice_6.jpeg). Also states Graduation Year 2027 — must not be extracted as a criterion.",
+    "image_path": "data/images/notice_6.jpeg",
+    "message_id": "N_EIGHTFOLD_001"
   }
 ]

@@ -50,8 +50,9 @@ class RawMessage(BaseModel):
     sender_role: SenderRole
     timestamp: datetime
     body: str
-    message_type: str = "text"
+    message_type: str = "text"  # "text" | "image", set in store.add_message
     is_forwarded: bool = False
+    image_id: str | None = None  # resolvable via the WhatsApp console's GET /media/{image_id}
 
 
 class Student(BaseModel):

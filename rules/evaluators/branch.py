@@ -14,8 +14,11 @@ def evaluate_branch(criterion: Criterion, student: Student) -> CriterionResult:
             message="Student branch is not on record.",
         )
 
-    allowed_branches: list[str] = criterion.value
-    passed = student.branch in allowed_branches
+    allowed_branches = criterion.value
+    if isinstance(allowed_branches, str) and allowed_branches.strip().upper() == "ALL":
+        passed = True
+    else:
+        passed = student.branch in allowed_branches
     return CriterionResult(
         criterion=criterion,
         status=Status.PASS if passed else Status.FAIL,

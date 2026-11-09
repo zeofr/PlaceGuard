@@ -180,12 +180,15 @@ class PortalAdapter(SourceAdapter):
         # Portal metadata
         lines.append(f"Status: {event.get('registration_status', 'UNKNOWN')}")
         lines.append(f"Posted: {event.get('time_since_posted', 'Unknown')}")
-        
-        # Add notes if present (for debugging/testing)
-        if event.get("notes"):
-            lines.append("")
-            lines.append(f"[PORTAL NOTE: {event['notes']}]")
-        
+
+        # NOTE: event["notes"] (e.g. "CONFLICT: ... rank 4 loses to rank 2") is
+        # authoring/dataset metadata describing how this fixture resolves against
+        # other sources - it must NEVER be rendered into the message body, since
+        # that is exactly the text handed to the LLM extractor. Including it would
+        # hand the model the answer to the conflict/temporal resolution it's
+        # supposed to be tested on, instead of letting authority rank + timestamp
+        # resolve it. Intentionally not included.
+
         return "\n".join(lines)
     
     def _parse_timestamp(self, timestamp_str: str) -> datetime:

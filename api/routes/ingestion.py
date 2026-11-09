@@ -21,6 +21,7 @@ from database.crud import (
 from database.vector_indexing import index_fact_to_vector_store
 from extraction.llm_client import get_llm_client
 from extraction.notice_extractor import extract_with_confidence
+from extraction.ocr_client import extract_text_from_image
 from ingestion.gmail.adapter import GmailAdapter, GmailAdapterError
 from ingestion.gmail.auth import GmailAuthenticationError
 from ingestion.gmail.classifier import EmailClassification, EmailClassifier
@@ -225,6 +226,29 @@ def ingest_notice(
         )
 
 
+def _resolve_notice_text(msg, whatsapp_url: str) -> str:
+    """Combine a message's typed caption and any attached image's OCR'd text into the
+    single string that flows into drive-identification and extraction, unchanged
+    downstream. A text-only message just returns its caption as before.
+    """
+    caption = (msg.body or "").strip()
+    if not msg.image_id:
+        return caption
+
+    import requests
+
+    try:
+        resp = requests.get(f"{whatsapp_url}/media/{msg.image_id}", timeout=10)
+        resp.raise_for_status()
+        ocr_text = extract_text_from_image(resp.content).strip()
+    except Exception:
+        ocr_text = ""
+
+    if caption and ocr_text:
+        return f"{caption}\n\n--- OCR extracted text from image ---\n{ocr_text}"
+    return caption or ocr_text
+
+
 @router.post("/process-whatsapp", response_model=ProcessWhatsAppResponse)
 def process_whatsapp_messages(
     whatsapp_url: str = "http://localhost:8001",
@@ -290,10 +314,22 @@ def process_whatsapp_messages(
                         "reason": f"Already processed ({len(existing_facts)} facts exist)",
                     })
                     continue
-                
+
+                # Resolve the effective text for this message: its typed caption,
+                # OCR'd text from an attached image, or both combined.
+                notice_text = _resolve_notice_text(msg, whatsapp_url)
+                if not notice_text:
+                    processing_details.append({
+                        "message_id": msg.message_id,
+                        "body": msg.body[:100] + "..." if len(msg.body) > 100 else msg.body,
+                        "status": "skipped",
+                        "reason": "No text available (OCR failed or unavailable, and no caption)",
+                    })
+                    continue
+
                 # First, use LLM to identify which drive this message refers to
-                drive_id, company_name = _identify_drive_from_message(msg.body, llm_client, db)
-                
+                drive_id, company_name = _identify_drive_from_message(notice_text, llm_client, db)
+
                 if not drive_id:
                     # Could not identify drive - skip this message
                     processing_details.append({
@@ -316,7 +352,7 @@ def process_whatsapp_messages(
                 # Extract criteria from message, holding back low-confidence
                 # facts instead of silently applying them.
                 facts, low_confidence_items = extract_with_confidence(
-                    notice_text=msg.body,
+                    notice_text=notice_text,
                     source_id=msg.message_id,
                     source_type=msg.source_type,
                     timestamp=msg.timestamp.replace(tzinfo=None),

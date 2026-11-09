@@ -137,16 +137,24 @@ def _load_source_index() -> dict[str, dict[str, Any]]:
     company_to_drive: dict[str, str] = {}
 
     for item in notices + whatsapp:
-        index[item["source_id"]] = {
-            "kind": "text",
+        entry = {
             "drive_id": item["drive_id"],
             "source_type": item["source_type"],
             "timestamp": item["timestamp"],
-            "text": item["text"],
             "channel": "email" if item["source_type"] in (
                 "placement_cell_email", "official_company_pdf",
             ) else "whatsapp",
         }
+        # Image-backed sources (OCR test cases) carry "image_path" instead of "text" —
+        # the actual text is only known once extract_with_confidence() is about to run,
+        # via a real OCR call in _build_extraction_cache() below.
+        if "image_path" in item:
+            entry["kind"] = "image"
+            entry["image_path"] = item["image_path"]
+        else:
+            entry["kind"] = "text"
+            entry["text"] = item["text"]
+        index[item["source_id"]] = entry
         company_to_drive[item["company"].strip().upper()] = item["drive_id"]
 
     for event in sis:
@@ -202,8 +210,16 @@ def _build_extraction_cache(
 
         t0 = time.perf_counter()
         try:
+            if item.get("kind") == "image":
+                # Real OCR call, not pre-transcribed text — this is the whole point of
+                # an OCR-sourced eval case (see extraction/ocr_client.py).
+                from extraction.ocr_client import extract_text_from_image
+                image_bytes = (Path(__file__).parent.parent / item["image_path"]).read_bytes()
+                notice_text = extract_text_from_image(image_bytes)
+            else:
+                notice_text = item["text"]
             facts, _low_conf = extract_with_confidence(
-                notice_text=item["text"],
+                notice_text=notice_text,
                 source_id=source_id,
                 source_type=SourceType(item["source_type"]),
                 timestamp=date_parser.parse(item["timestamp"]),
