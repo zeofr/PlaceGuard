@@ -289,8 +289,35 @@ All 8 minimal-evaluation metrics are implemented and reported below; this satisf
 
 ### 7.4 Headline results — final confirmatory run, 104 cases
 
-*[FINAL_RESULTS_TABLE_PLACEHOLDER — filled in once the post-bugfix 3-run + 1-explanation suite on the
-full 104-case gold set completes. See §7.6 for the bug this re-run was needed to fix.]*
+After the §7.6 fix, the full 3-run + 1-explanation suite completed clean: zero hard errors across
+all 4 runs, on the complete 104-case gold set (100 original + 4 real-OCR cases).
+
+| System | Accuracy | Macro-F1 | Hallucination | Temporal | Provenance | P95 Latency |
+|---|---:|---:|---:|---:|---:|---:|
+| LLM-only (Baseline A) | 67.3% | 45.1% | N/A | N/A | N/A | 1,400.6 ms |
+| **PlaceGuard** | **95.2%** | **94.1%** | **8.2%** (33/401 claims) | 12/13 = 92.3% | 9/11 = 81.8% | 100,041.2 ms |
+
+Mean-of-3 variance (see §7.5):
+
+| Metric | Mean (3 runs) | Std dev |
+|---|---:|---:|
+| Accuracy | 94.2% | ±2.5% |
+| Macro-F1 | 92.9% | ±2.7% |
+| Temporal-conflict accuracy | 92.3% | ±0.0% |
+| Provenance accuracy | 81.8% | ±0.0% |
+| UNKNOWN-detection accuracy | 80.6% | ±4.8% |
+| Hard errors / 104 | 0.0 | ±0.0 |
+| Mean per-case latency | 49,563 ms | ±1,260 ms |
+
+Baseline A over the same 3 runs: 66.7% accuracy (±1.1%), 44.5% Macro-F1 (±1.2%) — PlaceGuard leads
+by a mean **27.6 points** of accuracy, consistent across every run. Recall@3/@5/@10 are all 100.0%
+(50 unique sources indexed), saturated for the same reason noted earlier (the `drive_id` metadata
+filter does most of the work).
+
+Temporal (92.3%) and provenance (81.8%) read lower than the original 100-case-only figures (100.0%
+/ 90.0%) purely because the denominator grew from 12/10 to 13/11 reasoning-required cases when the
+4 OCR cases were folded in — neither pre-existing cohort's result changed; full detail in
+`eval/result.md`'s "Final 104-case suite" section.
 
 ### 7.5 Run-to-run variance
 

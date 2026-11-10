@@ -4,699 +4,727 @@
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 6119.89
+    "latency_ms": 3385.56
   },
   {
     "case_id": "CASE_002",
     "expected": "INELIGIBLE",
-    "predicted": "ELIGIBLE",
-    "correct": false,
-    "latency_ms": 37098.12
+    "predicted": "INELIGIBLE",
+    "correct": true,
+    "latency_ms": 739.47
   },
   {
     "case_id": "CASE_003",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 30872.2
+    "latency_ms": 854.41
   },
   {
     "case_id": "CASE_004",
     "expected": "UNKNOWN",
     "predicted": "ELIGIBLE",
     "correct": false,
-    "latency_ms": 23166.76
+    "latency_ms": 739.61
   },
   {
     "case_id": "CASE_005",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 37375.97
+    "latency_ms": 758.51
   },
   {
     "case_id": "CASE_006",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 32292.58
+    "latency_ms": 690.44
   },
   {
     "case_id": "CASE_007",
     "expected": "INELIGIBLE",
     "predicted": "INELIGIBLE",
     "correct": true,
-    "latency_ms": 27957.54
+    "latency_ms": 625.31
   },
   {
     "case_id": "CASE_008",
     "expected": "INELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": false,
-    "latency_ms": 7719.62
+    "latency_ms": 730.25
   },
   {
     "case_id": "CASE_009",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 10766.31
+    "latency_ms": 700.98
   },
   {
     "case_id": "CASE_010",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 8189.01
+    "latency_ms": 921.23
   },
   {
     "case_id": "CASE_011",
     "expected": "INELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": false,
-    "latency_ms": 11114.41
+    "latency_ms": 801.16
   },
   {
     "case_id": "CASE_012",
     "expected": "UNKNOWN",
     "predicted": "ELIGIBLE",
     "correct": false,
-    "latency_ms": 7372.09
+    "latency_ms": 842.26
   },
   {
     "case_id": "CASE_013",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 7495.48
+    "latency_ms": 830.66
   },
   {
     "case_id": "CASE_014",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 10386.07
+    "latency_ms": 653.13
   },
   {
     "case_id": "CASE_015",
     "expected": "INELIGIBLE",
-    "predicted": "ELIGIBLE",
-    "correct": false,
-    "latency_ms": 10742.47
+    "predicted": "INELIGIBLE",
+    "correct": true,
+    "latency_ms": 776.86
   },
   {
     "case_id": "CASE_016",
     "expected": "INELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": false,
-    "latency_ms": 7024.07
+    "latency_ms": 722.64
   },
   {
     "case_id": "CASE_017",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 9815.66
+    "latency_ms": 749.95
   },
   {
     "case_id": "CASE_018",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 7048.09
+    "latency_ms": 788.01
   },
   {
     "case_id": "CASE_019",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 5721.15
+    "latency_ms": 587.57
   },
   {
     "case_id": "CASE_020",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 7881.06
+    "latency_ms": 646.67
   },
   {
     "case_id": "CASE_021",
     "expected": "INELIGIBLE",
     "predicted": "INELIGIBLE",
     "correct": true,
-    "latency_ms": 5907.88
+    "latency_ms": 738.23
   },
   {
     "case_id": "CASE_022",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 8875.61
+    "latency_ms": 679.11
   },
   {
     "case_id": "CASE_023",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 8092.24
+    "latency_ms": 764.02
   },
   {
     "case_id": "CASE_024",
     "expected": "INELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": false,
-    "latency_ms": 6884.03
+    "latency_ms": 747.14
   },
   {
     "case_id": "CASE_025",
     "expected": "INELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": false,
-    "latency_ms": 6339.25
+    "latency_ms": 729.72
   },
   {
     "case_id": "CASE_026",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 7244.45
+    "latency_ms": 890.13
   },
   {
     "case_id": "CASE_027",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 6065.56
+    "latency_ms": 662.52
   },
   {
     "case_id": "CASE_028",
     "expected": "INELIGIBLE",
     "predicted": "INELIGIBLE",
     "correct": true,
-    "latency_ms": 9254.48
+    "latency_ms": 664.81
   },
   {
     "case_id": "CASE_029",
     "expected": "INELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": false,
-    "latency_ms": 6107.03
+    "latency_ms": 631.12
   },
   {
     "case_id": "CASE_030",
     "expected": "INELIGIBLE",
-    "predicted": "ELIGIBLE",
-    "correct": false,
-    "latency_ms": 7956.11
+    "predicted": "INELIGIBLE",
+    "correct": true,
+    "latency_ms": 623.74
   },
   {
     "case_id": "CASE_031",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 6830.39
+    "latency_ms": 614.73
   },
   {
     "case_id": "CASE_032",
     "expected": "INELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": false,
-    "latency_ms": 7447.34
+    "latency_ms": 855.46
   },
   {
     "case_id": "CASE_033",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 6242.02
+    "latency_ms": 863.9
   },
   {
     "case_id": "CASE_034",
     "expected": "INELIGIBLE",
     "predicted": "INELIGIBLE",
     "correct": true,
-    "latency_ms": 11063.26
+    "latency_ms": 800.34
   },
   {
     "case_id": "CASE_035",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 11213.25
+    "latency_ms": 792.33
   },
   {
     "case_id": "CASE_036",
     "expected": "UNKNOWN",
     "predicted": "ELIGIBLE",
     "correct": false,
-    "latency_ms": 12012.31
+    "latency_ms": 574.96
   },
   {
     "case_id": "CASE_037",
     "expected": "UNKNOWN",
     "predicted": "ELIGIBLE",
     "correct": false,
-    "latency_ms": 9573.81
+    "latency_ms": 623.42
   },
   {
     "case_id": "CASE_038",
     "expected": "UNKNOWN",
     "predicted": "ELIGIBLE",
     "correct": false,
-    "latency_ms": 14385.48
+    "latency_ms": 666.04
   },
   {
     "case_id": "CASE_039",
     "expected": "UNKNOWN",
     "predicted": "ELIGIBLE",
     "correct": false,
-    "latency_ms": 11445.65
+    "latency_ms": 702.17
   },
   {
     "case_id": "CASE_040",
     "expected": "INELIGIBLE",
     "predicted": "INELIGIBLE",
     "correct": true,
-    "latency_ms": 10956.64
+    "latency_ms": 718.18
   },
   {
     "case_id": "CASE_041",
     "expected": "INELIGIBLE",
     "predicted": "INELIGIBLE",
     "correct": true,
-    "latency_ms": 10133.45
+    "latency_ms": 704.42
   },
   {
     "case_id": "CASE_042",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 10939.9
+    "latency_ms": 674.43
   },
   {
     "case_id": "CASE_043",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 10823.02
+    "latency_ms": 608.01
   },
   {
     "case_id": "CASE_044",
     "expected": "INELIGIBLE",
     "predicted": "INELIGIBLE",
     "correct": true,
-    "latency_ms": 7341.75
+    "latency_ms": 644.23
   },
   {
     "case_id": "CASE_045",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 6026.18
+    "latency_ms": 629.79
   },
   {
     "case_id": "CASE_046",
     "expected": "INELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": false,
-    "latency_ms": 6891.95
+    "latency_ms": 630.45
   },
   {
     "case_id": "CASE_047",
     "expected": "INELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": false,
-    "latency_ms": 5881.9
+    "latency_ms": 612.01
   },
   {
     "case_id": "CASE_048",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 8724.95
+    "latency_ms": 568.99
   },
   {
     "case_id": "CASE_049",
     "expected": "INELIGIBLE",
     "predicted": "INELIGIBLE",
     "correct": true,
-    "latency_ms": 6444.95
+    "latency_ms": 637.67
   },
   {
     "case_id": "CASE_050",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 6675.63
+    "latency_ms": 563.47
   },
   {
     "case_id": "CASE_051",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 7311.57
+    "latency_ms": 908.58
   },
   {
     "case_id": "CASE_052",
     "expected": "INELIGIBLE",
     "predicted": "INELIGIBLE",
     "correct": true,
-    "latency_ms": 6263.07
+    "latency_ms": 839.1
   },
   {
     "case_id": "CASE_053",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 8073.49
+    "latency_ms": 748.59
   },
   {
     "case_id": "CASE_054",
     "expected": "UNKNOWN",
     "predicted": "ELIGIBLE",
     "correct": false,
-    "latency_ms": 7857.28
+    "latency_ms": 701.42
   },
   {
     "case_id": "CASE_055",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 8609.28
+    "latency_ms": 740.11
   },
   {
     "case_id": "CASE_056",
     "expected": "ELIGIBLE",
     "predicted": "INELIGIBLE",
     "correct": false,
-    "latency_ms": 7583.98
+    "latency_ms": 705.77
   },
   {
     "case_id": "CASE_057",
     "expected": "INELIGIBLE",
     "predicted": "INELIGIBLE",
     "correct": true,
-    "latency_ms": 8338.35
+    "latency_ms": 733.65
   },
   {
     "case_id": "CASE_058",
     "expected": "UNKNOWN",
     "predicted": "INELIGIBLE",
     "correct": false,
-    "latency_ms": 6456.96
+    "latency_ms": 812.61
   },
   {
     "case_id": "CASE_059",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 8510.95
+    "latency_ms": 627.37
   },
   {
     "case_id": "CASE_060",
     "expected": "ELIGIBLE",
     "predicted": "INELIGIBLE",
     "correct": false,
-    "latency_ms": 11333.74
+    "latency_ms": 837.14
   },
   {
     "case_id": "CASE_061",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 11626.46
+    "latency_ms": 1121.6
   },
   {
     "case_id": "CASE_062",
     "expected": "INELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": false,
-    "latency_ms": 14284.02
+    "latency_ms": 934.65
   },
   {
     "case_id": "CASE_063",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 16852.83
+    "latency_ms": 1134.3
   },
   {
     "case_id": "CASE_064",
     "expected": "UNKNOWN",
     "predicted": "ELIGIBLE",
     "correct": false,
-    "latency_ms": 15097.6
+    "latency_ms": 876.04
   },
   {
     "case_id": "CASE_065",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 25662.99
+    "latency_ms": 798.24
   },
   {
     "case_id": "CASE_066",
     "expected": "INELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": false,
-    "latency_ms": 14944.3
+    "latency_ms": 663.48
   },
   {
     "case_id": "CASE_067",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 12826.82
+    "latency_ms": 764.84
   },
   {
     "case_id": "CASE_068",
     "expected": "INELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": false,
-    "latency_ms": 11549.85
+    "latency_ms": 693.38
   },
   {
     "case_id": "CASE_069",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 9140.22
+    "latency_ms": 786.36
   },
   {
     "case_id": "CASE_070",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 8293.98
+    "latency_ms": 602.63
   },
   {
     "case_id": "CASE_071",
     "expected": "INELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": false,
-    "latency_ms": 6589.69
+    "latency_ms": 703.37
   },
   {
     "case_id": "CASE_072",
     "expected": "INELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": false,
-    "latency_ms": 7083.19
+    "latency_ms": 703.77
   },
   {
     "case_id": "CASE_073",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 11821.89
+    "latency_ms": 647.25
   },
   {
     "case_id": "CASE_074",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 8709.77
+    "latency_ms": 748.52
   },
   {
     "case_id": "CASE_075",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 7625.37
+    "latency_ms": 1688.94
   },
   {
     "case_id": "CASE_076",
     "expected": "INELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": false,
-    "latency_ms": 8699.44
+    "latency_ms": 1150.49
   },
   {
     "case_id": "CASE_077",
     "expected": "INELIGIBLE",
     "predicted": "INELIGIBLE",
     "correct": true,
-    "latency_ms": 7785.44
+    "latency_ms": 1141.22
   },
   {
     "case_id": "CASE_078",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 15348.01
+    "latency_ms": 750.29
   },
   {
     "case_id": "CASE_079",
     "expected": "INELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": false,
-    "latency_ms": 9940.53
+    "latency_ms": 667.28
   },
   {
     "case_id": "CASE_080",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 11427.97
+    "latency_ms": 610.74
   },
   {
     "case_id": "CASE_081",
     "expected": "UNKNOWN",
     "predicted": "INELIGIBLE",
     "correct": false,
-    "latency_ms": 9485.54
+    "latency_ms": 725.96
   },
   {
     "case_id": "CASE_082",
     "expected": "INELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": false,
-    "latency_ms": 12388.8
+    "latency_ms": 691.99
   },
   {
     "case_id": "CASE_083",
     "expected": "INELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": false,
-    "latency_ms": 7749.25
+    "latency_ms": 916.49
   },
   {
     "case_id": "CASE_084",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 12059.55
+    "latency_ms": 860.99
   },
   {
     "case_id": "CASE_085",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 13215.65
+    "latency_ms": 713.06
   },
   {
     "case_id": "CASE_086",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 16030.96
+    "latency_ms": 697.47
   },
   {
     "case_id": "CASE_087",
     "expected": "UNKNOWN",
     "predicted": "ELIGIBLE",
     "correct": false,
-    "latency_ms": 12414.43
+    "latency_ms": 794.13
   },
   {
     "case_id": "CASE_088",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 14468.9
+    "latency_ms": 651.29
   },
   {
     "case_id": "CASE_089",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 18378.04
+    "latency_ms": 758.83
   },
   {
     "case_id": "CASE_090",
     "expected": "INELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": false,
-    "latency_ms": 12313.69
+    "latency_ms": 878.72
   },
   {
     "case_id": "CASE_091",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 11083.56
+    "latency_ms": 931.44
   },
   {
     "case_id": "CASE_092",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 12697.76
+    "latency_ms": 919.67
   },
   {
     "case_id": "CASE_093",
     "expected": "UNKNOWN",
     "predicted": "ELIGIBLE",
     "correct": false,
-    "latency_ms": 11177.5
+    "latency_ms": 850.63
   },
   {
     "case_id": "CASE_094",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 13959.59
+    "latency_ms": 859.41
   },
   {
     "case_id": "CASE_095",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 10623.03
+    "latency_ms": 720.58
   },
   {
     "case_id": "CASE_096",
     "expected": "INELIGIBLE",
     "predicted": "INELIGIBLE",
     "correct": true,
-    "latency_ms": 11907.36
+    "latency_ms": 722.78
   },
   {
     "case_id": "CASE_097",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 10210.56
+    "latency_ms": 671.85
   },
   {
     "case_id": "CASE_098",
     "expected": "INELIGIBLE",
     "predicted": "INELIGIBLE",
     "correct": true,
-    "latency_ms": 13232.28
+    "latency_ms": 662.87
   },
   {
     "case_id": "CASE_099",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 12901.81
+    "latency_ms": 705.39
   },
   {
     "case_id": "CASE_100",
     "expected": "ELIGIBLE",
     "predicted": "ELIGIBLE",
     "correct": true,
-    "latency_ms": 9260.93
+    "latency_ms": 591.23
+  },
+  {
+    "case_id": "CASE_101",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 3425.36
+  },
+  {
+    "case_id": "CASE_102",
+    "expected": "ELIGIBLE",
+    "predicted": "INELIGIBLE",
+    "correct": false,
+    "latency_ms": 3266.32
+  },
+  {
+    "case_id": "CASE_103",
+    "expected": "ELIGIBLE",
+    "predicted": "ELIGIBLE",
+    "correct": true,
+    "latency_ms": 2924.34
+  },
+  {
+    "case_id": "CASE_104",
+    "expected": "INELIGIBLE",
+    "predicted": "INELIGIBLE",
+    "correct": true,
+    "latency_ms": 2986.83
   }
 ]
