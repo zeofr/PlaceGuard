@@ -67,10 +67,20 @@ def _format_student(student) -> str:
     return "\n".join(lines)
 
 
+def _resolve_text(item: dict) -> str:
+    """Return the item's text, running real OCR for image-backed sources."""
+    if item.get("kind") == "image":
+        from extraction.ocr_client import extract_text_from_image
+        image_bytes = (Path(__file__).parent.parent / item["image_path"]).read_bytes()
+        return extract_text_from_image(image_bytes)
+    return item["text"]
+
+
 def _format_message(source_id: str, item: dict) -> str:
+    text = _resolve_text(item)
     return (
         f"**[{item['timestamp']}] {item['source_type']}** (source_id: `{source_id}`)\n\n"
-        f"> {item['text'].replace(chr(10), chr(10) + '> ')}\n"
+        f"> {text.replace(chr(10), chr(10) + '> ')}\n"
     )
 
 

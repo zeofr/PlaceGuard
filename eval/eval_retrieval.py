@@ -30,6 +30,16 @@ if hasattr(sys.stdout, "reconfigure"):
 GOLD_SET_FILE = DATA_DIR / "gold_set.json"
 
 
+def _resolve_text(item: dict) -> str:
+    """Return the item's text, running real OCR for image-backed sources (same OCR
+    call run_eval.py uses, not pre-transcribed text standing in for it)."""
+    if item.get("kind") == "image":
+        from extraction.ocr_client import extract_text_from_image
+        image_bytes = (Path(__file__).parent.parent / item["image_path"]).read_bytes()
+        return extract_text_from_image(image_bytes)
+    return item["text"]
+
+
 def build_scratch_store(source_index: dict) -> tuple[PlacementVectorStore, str]:
     scratch_dir = tempfile.mkdtemp(prefix="placeguard_eval_chroma_")
     store = PlacementVectorStore(persist_directory=scratch_dir, collection_name="eval_notices")
@@ -37,7 +47,7 @@ def build_scratch_store(source_index: dict) -> tuple[PlacementVectorStore, str]:
     ids, texts, metadatas = [], [], []
     for source_id, item in source_index.items():
         ids.append(source_id)
-        texts.append(item["text"])
+        texts.append(_resolve_text(item))
         metadatas.append({
             "drive_id": item["drive_id"],
             "source_type": item["source_type"],

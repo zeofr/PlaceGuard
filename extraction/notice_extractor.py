@@ -741,6 +741,19 @@ def extract_criteria_from_notice(
             if value != 0:
                 print(f"INFO: Forced value for aliased {item['criterion_type']!r} criterion {value!r} -> 0")
             value = 0
+        elif criterion_type == "max_backlogs" and isinstance(value, str) and not value.strip().lstrip("-").isdigit():
+            # The LLM tagged this under a generic type (e.g. "backlogs") rather than one
+            # of the explicit no-backlogs synonyms above, but still attached a sentence
+            # instead of a count (e.g. "No current/active backlogs"). max_backlogs must be
+            # numeric for the rule engine's `<=` comparison - parse the sentence instead of
+            # crashing on it, and drop the criterion if it genuinely isn't parseable.
+            stripped = value.strip().lower()
+            if "no" in stripped.split() or stripped in ("none", "nil"):
+                print(f"INFO: Parsed non-numeric max_backlogs value {value!r} -> 0")
+                value = 0
+            else:
+                print(f"WARNING: Skipping max_backlogs criterion - unparseable non-numeric value {value!r}")
+                continue
         elif criterion_type == "min_cgpa" and isinstance(value, (int, float)) and value > 10:
             # CGPA is always 0-10; a value > 10 can only be a percentage the LLM read
             # literally (e.g. "60% across 10th, 12th and UG") instead of converting to

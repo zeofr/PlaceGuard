@@ -49,9 +49,19 @@ Use UNKNOWN only when you genuinely cannot determine eligibility from the inform
 """
 
 
+def _resolve_text(item: dict) -> str:
+    """Return the item's text, running real OCR for image-backed sources (same OCR
+    call run_eval.py uses, not pre-transcribed text standing in for it)."""
+    if item.get("kind") == "image":
+        from extraction.ocr_client import extract_text_from_image
+        image_bytes = (Path(__file__).parent.parent / item["image_path"]).read_bytes()
+        return extract_text_from_image(image_bytes)
+    return item["text"]
+
+
 def build_prompt(student: dict, items: list[dict]) -> str:
     notice_texts = "\n\n---\n\n".join(
-        f"[{item['source_type'].upper()} | {item['timestamp']} | id={source_id}]\n{item['text']}"
+        f"[{item['source_type'].upper()} | {item['timestamp']} | id={source_id}]\n{_resolve_text(item)}"
         for source_id, item in items
     )
     return f"""STUDENT PROFILE:
